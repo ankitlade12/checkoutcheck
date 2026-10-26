@@ -13,9 +13,7 @@ CheckoutCheck is an evidence workbench for engineers evaluating camera-assisted 
 
 The working hackathon POC includes five image methods, an original-video lab and a separately implemented transaction evaluator. Image and video workflows have been exercised locally and on AWS. Real synchronized checkout/POS validation remains an open requirement.
 
-**Hackathon:** [OpenCV 2026](https://opencv26.devpost.com/)<br>
-**Evidence:** original camera-captured material; no generated footage or invented POS logs<br>
-**Access:** local application or private AWS Session Manager tunnel; no application login
+**Hackathon:** [OpenCV 2026](https://opencv26.devpost.com/)
 
 ## Quick Highlights
 
