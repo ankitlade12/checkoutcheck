@@ -1,0 +1,57 @@
+"""Record the actual local UI and existing real evidence; never seed observations."""
+import os
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+local_browsers=Path('private-data/playwright').resolve()
+if (local_browsers/'ffmpeg-1011').exists():
+    os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH',str(local_browsers))
+base_url=os.environ.get('CHECKOUTCHECK_URL','http://127.0.0.1:8765').rstrip('/')
+output=Path(os.environ.get('CHECKOUTCHECK_RECORDING_DIR','artifacts/demo-recording'))
+output.mkdir(parents=True,exist_ok=True)
+with sync_playwright() as p:
+    browser=p.chromium.launch(executable_path=os.environ.get('CHECKOUTCHECK_BROWSER'),headless=True)
+    context=browser.new_context(viewport={'width':1280,'height':800},record_video_dir=str(output),record_video_size={'width':1280,'height':800})
+    page=context.new_page()
+    errors=[]
+    page.on('pageerror',lambda error:errors.append(str(error)))
+    page.goto(base_url,wait_until='networkidle')
+    page.wait_for_timeout(4000)
+    page.locator('nav a[data-page="perception"]').click()
+    page.wait_for_timeout(5000)
+    data=page.request.get(base_url+'/v1/perception').json()
+    trained=next(r for r in data['runs'] if r['model']=='fasterrcnn-rpc-v1' and r['status']=='completed')
+    sift=next(r for r in data['runs'] if r['model']=='sift-reference-v1' and r['status']=='completed')
+    page.locator(f'[data-perception-run="{trained["id"]}"]').click()
+    page.locator('#perception-result').scroll_into_view_if_needed()
+    page.wait_for_timeout(6000)
+    page.locator('.photo-card').first.click()
+    page.locator('#rpc-detail-image').scroll_into_view_if_needed()
+    page.wait_for_timeout(5000)
+    page.locator('#show-reference').uncheck()
+    page.locator('#rpc-detail-image').scroll_into_view_if_needed()
+    page.wait_for_timeout(4000)
+    page.locator('#show-reference').check()
+    page.locator('#perception-other').select_option(sift['id'])
+    page.get_by_role('button',name='Compare measured results').click()
+    page.locator('#perception-comparison').scroll_into_view_if_needed()
+    page.wait_for_timeout(5000)
+    page.locator('nav a[data-page="videos"]').click()
+    page.locator('#videos').scroll_into_view_if_needed()
+    page.wait_for_timeout(4000)
+    page.locator('[data-video-open]').first.click()
+    page.locator('#source-video').scroll_into_view_if_needed()
+    page.locator('#source-video').evaluate('(v)=>v.play()')
+    page.wait_for_timeout(5500)
+    page.locator('[data-video-frame="16"]').click()
+    page.locator('#source-time-display').scroll_into_view_if_needed()
+    page.wait_for_timeout(4000)
+    page.locator('nav a[data-page="settings"]').click()
+    page.locator('#settings').scroll_into_view_if_needed()
+    page.wait_for_timeout(5000)
+    assert not errors,errors
+    video=page.video
+    context.close()
+    video.save_as(str(output/'checkoutcheck-walkthrough.webm'))
+    browser.close()
+    print(str(output/'checkoutcheck-walkthrough.webm'))

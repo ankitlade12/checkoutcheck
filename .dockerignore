@@ -1,0 +1,16 @@
+.venv
+private-data
+artifacts
+.git
+*.docx
+__pycache__
+tests
+.env
+
+.aws
+.agents
+.codex
+.env.*
+*.pem
+*.key
+AGENTS.md

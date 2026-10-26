@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CheckoutCheck — Evidence workbench</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css"><script src="/evidence.js" defer></script><script src="/app.js" defer></script><script src="/perception.js" defer></script><script src="/videos.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#overview"><span class="brand-mark">C<span>✓</span></span>CheckoutCheck</a>
+    <div class="workspace"><span class="workspace-icon">W</span><div><span id="workspace-location">Local workspace</span><small>Private · single operator</small></div><span class="dot"></span></div>
+    <div class="nav-label">WORKBENCH</div>
+    <nav aria-label="Main navigation">
+      <a href="#overview" data-page="overview"><span>◫</span>Overview</a>
+      <a href="#perception" data-page="perception"><span>◉</span>Real-data lab</a>
+      <a href="#videos" data-page="videos"><span>▶</span>Real-video lab</a>
+      <a href="#suites" data-page="suites"><span>▦</span>Scenario suites<span class="nav-count" id="suite-count">0</span></a>
+      <a href="#runs" data-page="runs"><span>▷</span>Evaluation runs</a>
+      <a href="#cases" data-page="cases"><span>▤</span>Evidence library</a>
+      <a href="#compare" data-page="compare"><span>⇄</span>Compare runs</a>
+    </nav>
+    <div class="nav-label secondary-label">PROJECT</div>
+    <nav aria-label="Project navigation"><a href="#settings" data-page="settings"><span>⚙</span>Setup & requirements</a></nav>
+    <div class="sidebar-bottom"><div class="status"><span class="dot"></span><span id="engine-location">Local engine</span></div><p>OpenCV 5 · Python<br><span id="aws-sidebar-status">AWS connection not checked</span></p><a href="/docs" target="_blank" rel="noopener">API reference ↗</a><div class="profile"><span>CC</span><div>CheckoutCheck<small>Community edition · 0.1</small></div></div></div>
+  </aside>
+  <main>
+    <header class="topbar"><span>Workspace <span class="slash">/</span> <strong id="breadcrumb">Overview</strong></span><span class="environment">◉ Local development</span></header>
+    <div class="content">
+      <div id="notice" role="status" hidden></div>
+      <section id="overview" class="page">
+        <div class="page-heading"><div><div class="eyebrow">EVIDENCE BEFORE ASSUMPTIONS</div><h1>A clearer view of checkout.</h1><p>Evaluate legitimate interactions. Trace every decision. Make findings reproducible.</p></div><button class="primary" data-action="ingest">＋ Add real footage</button></div>
+        <div class="info-strip"><span class="info-icon">i</span><div><strong>Your workspace starts with real evidence.</strong><span>Explore original RPC photographs in the Real-data lab, or import your own consented checkout recording.</span></div><a href="#perception">Open Real-data lab ↗</a></div>
+        <div class="stat-grid" id="overview-stats"></div>
+        <div class="two-columns">
+          <section class="panel"><div class="panel-heading"><h2>Your evaluation workflow</h2><span class="tag">GET STARTED</span></div><div class="workflow">
+            <div><span class="step">01</span><div><h3>Bring the evidence</h3><p>Upload a real checkout recording and its mock scan log. Keep reference labels separate.</p><button class="text-button" data-action="ingest">Import a recording →</button></div></div>
+            <div><span class="step">02</span><div><h3>Freeze a reviewed suite</h3><p>Lock annotations, inputs, and split assignments into a reproducible version.</p><a href="#suites">Manage scenario suites →</a></div></div>
+            <div><span class="step">03</span><div><h3>Run, inspect, and compare</h3><p>Follow model decisions back to video and transaction events. Export the complete scoring record.</p><a href="#runs">Open evaluation runs →</a></div></div>
+          </div></section>
+          <section class="panel principles"><div class="panel-heading"><h2>Built for careful conclusions</h2><span>↗</span></div><div class="principle-visual" aria-hidden="true"><div class="frame-corner tl"></div><div class="frame-corner tr"></div><div class="frame-corner bl"></div><div class="frame-corner br"></div><span class="visual-box">✓</span><div class="visual-line"></div><small>OBSERVE → VERIFY → UNDERSTAND</small></div><h3>A mismatch is a finding.<br>It is not an intention.</h3><p>Transaction truth, visual observability, and model decisions are evaluated independently.</p><div class="chips"><span>No identity inference</span><span>No live enforcement</span><span>Traceable results</span></div></section>
+        </div>
+        <section class="panel recent-panel"><div class="panel-heading"><h2>Recent evaluations</h2><a href="#runs">View all runs →</a></div><div id="recent-runs"></div></section>
+      </section>
+      <section id="suites" class="page" hidden><div class="page-heading"><div><div class="eyebrow">VERSIONED INPUTS</div><h1>Scenario suites</h1><p>Every run starts with an immutable set of reviewed cases.</p></div><button class="primary" data-action="freeze">＋ Freeze a suite</button></div><div id="suite-list"></div></section>
+      <section id="runs" class="page" hidden><div class="page-heading"><div><div class="eyebrow">MEASURED, NOT ASSUMED</div><h1>Evaluation runs</h1><p>One worker. Durable run records. Explicit exclusions.</p></div><button class="primary" data-action="run">▷ New evaluation</button></div><div class="panel" id="run-list"></div><div id="run-detail"></div></section>
+      <section id="cases" class="page" hidden><div class="page-heading"><div><div class="eyebrow">SOURCE OF EVIDENCE</div><h1>Evidence library</h1><p>Real recordings, synchronized scan events, and reviewed outcomes.</p></div><button class="primary" data-action="ingest">＋ Add real footage</button></div><div id="case-list"></div><div id="case-detail"></div></section>
+      <section id="compare" class="page" hidden><div class="page-heading"><div><div class="eyebrow">REGRESSIONS IN CONTEXT</div><h1>Compare runs</h1><p>Compare predictions on the exact same suite and input track.</p></div></div><form id="compare-form" class="panel form-panel"><div class="form-grid"><label>Baseline run<select id="baseline" required></select></label><label>Candidate run<select id="candidate" required></select></label></div><button class="primary" type="submit">Compare results →</button></form><div id="comparison-result"></div></section>
+      <section id="settings" class="page" hidden><div class="page-heading"><div><div class="eyebrow">SUPPORTED CONDITIONS</div><h1>Setup & requirements</h1><p>A transparent starting point for real-world evaluation.</p></div></div><div class="two-columns"><section class="panel prose"><h2>Transaction video baseline</h2><p>The built-in adapter uses <strong>OpenCV 5 ArUco markers</strong> to associate product instances over time and reconcile the visible bagging inventory with net scan counts at payment.</p><p>This is a marker-assisted instrumentation baseline. It does not recognize unmarked grocery products, infer intent, or validate a commercial checkout model.</p><ul><li>Real MP4, up to 60 seconds, 250 MB, 1920 × 1080, and 60 fps.</li><li>Fixed camera, bagging zone on the right, initially empty inventory.</li><li>One distinct DICT_4X4_50 marker per product instance (IDs 0–49).</li><li>All merchandise must be marked. Labels must be independently reviewed.</li><li>Keep product markers visible through payment. Occluded or untracked items may be outside the baseline's ability to detect.</li><li>Use mock scan events, never actual customer payment data.</li></ul><p>External model predictions can be imported for scoring. Their inference is labeled unverified.</p><h2>Image perception</h2><p>The Real-data lab runs classical OpenCV methods and photo-trained Faster R-CNN on original RPC photographs. SIFT estimates SKU identity from training examples; Faster R-CNN estimates product locations without SKU identity. These experimental methods miss many objects; image results do not establish scan or payment status.</p></section><section class="panel prose"><h2>Deployment status</h2><div class="setting-row"><span>Local workspace</span><span class="badge good">Available</span></div><div class="setting-row"><span>OpenCV 5 analysis</span><span class="badge good">Installed</span></div><div class="setting-row"><span>Original RPC photographs</span><a href="#perception">Real-data lab →</a></div><div class="setting-row"><span>AWS account connection</span><span id="aws-connection-status" class="badge">Not checked</span></div><p id="aws-connection-detail"></p><div class="setting-row"><span>Execution evidence</span><span id="execution-status" class="badge">Local results</span></div><p>This application is for a trusted local operator. Bind it to <code>127.0.0.1</code>. For the login-free hackathon demo, use local access or a private AWS Session Manager tunnel. A public write endpoint is not supported.</p><h2>Contribution protocol</h2><p>Record only with permission, keep faces and identifying audio out of frame where possible, and review physical inventory separately from the scan log. Evaluation permission does not imply public-release permission.</p><a href="/docs" target="_blank" rel="noopener">Explore API contracts ↗</a></section></div></section>
+      <section id="perception" class="page" hidden>
+        <div class="page-heading"><div><div class="eyebrow">ORIGINAL PHOTOGRAPHS · MEASURED RESULTS</div><h1>Real-data lab</h1><p>Evaluate product localization and counting on a fixed RPC subset.</p></div><button class="secondary" id="refresh-perception">Refresh results</button></div>
+        <div id="perception-content"></div><div id="perception-result"></div><div id="perception-image-detail"></div>
+      </section>
+      <section id="videos" class="page" hidden><div class="page-heading"><div><div class="eyebrow">ORIGINAL CAMERA RECORDINGS</div><h1>Real-video lab</h1><p>Inspect publisher video, original timestamps and OpenCV diagnostics.</p></div></div><div id="video-library"></div><div id="video-inspector"></div></section>
+      <footer>CheckoutCheck <span>Evidence-based evaluation for camera-assisted checkout.</span><span>Local research workspace · Real evidence</span></footer>
+    </div>
+  </main>
+  <dialog id="modal"><div class="modal-heading"><h2 id="modal-title"></h2><button class="icon-button" id="close-modal" aria-label="Close dialog">×</button></div><div id="modal-body"></div></dialog>
+</body>
+</html>
