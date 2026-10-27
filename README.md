@@ -3,7 +3,7 @@
 [![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![OpenCV 5](https://img.shields.io/badge/OpenCV-5.0-5C3EE8.svg?logo=opencv&logoColor=white)](https://opencv.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![AWS](https://img.shields.io/badge/AWS-HTTPS%20demo-FF9900.svg)](https://d2pt18a0j9tuil.cloudfront.net)
+[![AWS](https://img.shields.io/badge/AWS-Live%20application-FF9900.svg)](https://d2pt18a0j9tuil.cloudfront.net)
 [![CI](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml/badge.svg)](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 
@@ -13,7 +13,7 @@ CheckoutCheck is an evidence workbench for engineers evaluating camera-assisted 
 
 The working hackathon POC includes five image baselines, an adaptive vision agent, an original-video lab and a separately implemented transaction evaluator. Image and video workflows have been exercised locally and on AWS. Real synchronized checkout/POS validation remains an open requirement.
 
-**[Open the live application](https://d2pt18a0j9tuil.cloudfront.net)** · [Watch the product demo](https://d2pt18a0j9tuil.cloudfront.net/demo) · [Technical report](docs/technical-report.md)
+**[Open the live application](https://d2pt18a0j9tuil.cloudfront.net)** · [Technical report](docs/technical-report.md)
 
 **Hackathon:** [OpenCV 2026](https://opencv26.devpost.com/)
 
@@ -30,11 +30,10 @@ The working hackathon POC includes five image baselines, an adaptive vision agen
 - **Actual COOL evaluation** — official vendor runtime on Graviton; application workloads measured against stock OpenCV, with raw reports.
 - **Visible limitations** — no inferred payment truth, intent detection or production-accuracy claims.
 
-## Deployment and Demo Access
+## Application Access
 
 | Surface | Address or entry point | Access |
 | --- | --- | --- |
-| Product demo · 4:11 | [Watch with Indian English narration](https://d2pt18a0j9tuil.cloudfront.net/demo) | Working product, architecture and principal results |
 | Live application | [Open CheckoutCheck](https://d2pt18a0j9tuil.cloudfront.net) | Inspect results, agent traces, original clips and COOL evidence |
 | Local application | <http://127.0.0.1:8765> | Start `./run.command` after installation |
 | Live real-data lab | [Inspect image results](https://d2pt18a0j9tuil.cloudfront.net/#perception) | Completed methods, overlays and comparisons |
@@ -46,7 +45,7 @@ The working hackathon POC includes five image baselines, an adaptive vision agen
 
 **Hosting ends November 10, 2026 at 6 p.m. Central.** Automatic AWS teardown is enabled for that deadline, including permanent deletion of cloud evidence without a backup. See the [cleanup scope and exceptions](infra/aws-public-review.md#automatic-teardown).
 
-The HTTPS judge demo exposes completed evidence through a separate read-only service. Execution and uploads remain in the private operator workspace. A fresh clone contains no datasets, weights or credentials. See the [technical report](docs/technical-report.md), [agent evaluation](docs/agentic-vision.md), [COOL benchmark](docs/cool-evaluation.md) and [public hosting guide](infra/aws-public-review.md).
+The HTTPS application exposes completed evidence through a separate read-only service. Execution and uploads remain in the private operator workspace. A fresh clone contains no datasets, weights or credentials. See the [technical report](docs/technical-report.md), [agent evaluation](docs/agentic-vision.md), [COOL benchmark](docs/cool-evaluation.md) and [public hosting guide](infra/aws-public-review.md).
 
 ## The Problem
 
@@ -300,7 +299,6 @@ checkoutcheck/
 | `CHECKOUTCHECK_RUNTIME` | `local_single_operator` | Deployment label, not proof that an AWS workload ran |
 | `CHECKOUTCHECK_URL` | `http://127.0.0.1:8765` | Target used by browser checks and recording |
 | `CHECKOUTCHECK_BROWSER` | Playwright-managed browser | Optional Chromium executable |
-| `CHECKOUTCHECK_RECORDING_DIR` | `artifacts/demo-recording` | Private walkthrough recording destination |
 
 No LLM API key or AWS account is needed locally. Keep the operator application on loopback or behind the private SSM tunnel. Public hosting must use the separate read-only review mode described in the hosting guide.
 
@@ -308,7 +306,7 @@ No LLM API key or AWS account is needed locally. Keep the operator application o
 
 The release includes a public review application and a private execution workspace. Next steps are real checkout/POS evidence, stronger held-out detector evaluation, independent review and data-governance workflows, and external pilot testing. Accounts are deferred from the hackathon scope. Full community MVP acceptance remains open.
 
-The [technical report](docs/technical-report.md) records measured results and remaining acceptance requirements. The AWS review application and narrated product video are published; Devpost final submission remains a separate step.
+The [technical report](docs/technical-report.md) records measured results and remaining acceptance requirements. The AWS review application is published; Devpost final submission remains a separate step.
 
 ## Licensing
 
