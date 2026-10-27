@@ -310,8 +310,6 @@ The release includes a public review application and a private execution workspa
 
 The [technical report](docs/technical-report.md) records measured results and remaining acceptance requirements. The AWS review application and narrated product video are published; Devpost final submission remains a separate step.
 
-## Contributing and Licensing
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change or contributing evidence. Report reproducible software issues without uploading private recordings, credentials or customer details. For sensitive reports, follow [SECURITY.md](SECURITY.md).
+## Licensing
 
 Project source code is available under the [MIT license](LICENSE). Dataset and model rights are separate: RPC carries noncommercial/share-alike terms, RetailAction has its own license, and pretrained dependencies retain their upstream terms. This repository does not redistribute their media or weights. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

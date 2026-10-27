@@ -63,7 +63,7 @@ def package(root, output):
     (output/'README.md').write_text('Read technical-report.md and the source README. The AWS judge endpoint is https://d2pt18a0j9tuil.cloudfront.net. Agent and COOL evidence are available there. This package is prepared for review; Devpost submission is not implied. The video identifies team members by name; live team footage is not included.\n')
     with zipfile.ZipFile(output/'checkoutcheck-source.zip','w',zipfile.ZIP_DEFLATED) as archive:
         roots=['checkoutcheck','apps/web','tests','docs','infra','.github']
-        files=[root/name for name in ['README.md','LICENSE','CONTRIBUTING.md','SECURITY.md','THIRD_PARTY_NOTICES.md','pyproject.toml','requirements.lock','compose.yaml','run.command','start-aws.command','.dockerignore','.gitignore']]
+        files=[root/name for name in ['README.md','LICENSE','THIRD_PARTY_NOTICES.md','pyproject.toml','requirements.lock','compose.yaml','run.command','start-aws.command','.dockerignore','.gitignore']]
         for directory in roots:files.extend((root/directory).rglob('*'))
         for file in sorted(files):
             if file.is_file() and '__pycache__' not in file.parts and file.suffix not in {'.pyc','.mp4','.jpg','.pth'}:
