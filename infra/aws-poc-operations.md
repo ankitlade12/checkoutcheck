@@ -1,6 +1,6 @@
 # Private AWS deployment
 
-The current POC has been exercised on AWS; see [verification](../docs/aws-verification.md). These instructions create your own private deployment. Deployment records, credentials, input archives and generated results are not included in Git.
+The current POC has been exercised on AWS; see [verification](../docs/technical-report.md). These instructions create your own private deployment. Deployment records, credentials, input archives and generated results are not included in Git.
 
 ## Prerequisites
 

@@ -3,7 +3,7 @@
 [![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![OpenCV 5](https://img.shields.io/badge/OpenCV-5.0-5C3EE8.svg?logo=opencv&logoColor=white)](https://opencv.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![AWS](https://img.shields.io/badge/AWS-HTTPS%20demo-FF9900.svg)](docs/aws-verification.md)
+[![AWS](https://img.shields.io/badge/AWS-HTTPS%20demo-FF9900.svg)](docs/technical-report.md)
 [![CI](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml/badge.svg)](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 
@@ -40,7 +40,7 @@ The working hackathon POC includes five image baselines, an adaptive vision agen
 | AWS application | <http://127.0.0.1:8766> | Your deployed stack plus an authorized SSM tunnel |
 | Health check | `/v1/health` | Database and worker readiness |
 | API contracts | [`docs/contracts.md`](docs/contracts.md) | Also served at `/docs` |
-| Cloud verification | [`docs/aws-verification.md`](docs/aws-verification.md) | Recorded measurements and limitations |
+| Cloud verification | [`docs/technical-report.md`](docs/technical-report.md) | Recorded measurements and limitations |
 
 The HTTPS judge demo exposes completed evidence through a separate read-only service. Execution and uploads remain in the private operator workspace. A fresh clone contains no datasets, weights or credentials. See the [technical report](docs/technical-report.md), [agent evaluation](docs/agentic-vision.md), [COOL benchmark](docs/cool-evaluation.md) and [public hosting guide](infra/aws-public-review.md).
 
@@ -162,7 +162,7 @@ Inspect six original RetailAction clips covering 176 encoded frames. The interfa
 
 The implemented workflow accepts real MP4, recorded JSON/CSV scan events, marker/SKU mappings and reference annotations. Reviewed cases can be frozen into immutable suites, evaluated using the ArUco instrumentation baseline or imported predictions, replayed, compared and exported.
 
-This path still needs real synchronized recordings for end-to-end validation. All products must be marked and visible for the built-in baseline. See the [capture protocol](docs/capture-protocol.md) and [input/output contracts](docs/contracts.md).
+This path still needs real synchronized recordings for end-to-end validation. All products must be marked and visible for the built-in baseline. See the [capture protocol](docs/real-dataset-sources.md#real-transaction-capture-protocol) and [input/output contracts](docs/contracts.md).
 
 ## Measured Results
 
@@ -176,7 +176,7 @@ AWS execution on the fixed 24-photo subset, 291 reference objects; one-to-one lo
 | Official COCO Faster R-CNN | 13 / 291 | 92.86% | 4.47% | 11.54 |
 | RPC fine-tuned Faster R-CNN | 105 / 291 | 74.47% | 36.08% | 6.25 |
 
-The best detector still misses **186 of 291 objects** and has no SKU head. This is a small exploratory sample, not a full-dataset benchmark or evidence of checkout reliability. Some classical results differ across macOS and Linux; [local measurements](docs/rpc-benchmark.md) and [AWS measurements](docs/aws-verification.md) remain separately labeled.
+The best detector still misses **186 of 291 objects** and has no SKU head. This is a small exploratory sample, not a full-dataset benchmark or evidence of checkout reliability. Some classical results differ across macOS and Linux; [local measurements](docs/rpc-benchmark.md) and [AWS measurements](docs/technical-report.md) remain separately labeled.
 
 ## Quick Start
 
@@ -252,7 +252,7 @@ python tests/browser_perception.py
 python tests/browser_videos.py
 ```
 
-The smoke check expects an empty transaction workspace. Perception/video checks require the original-data setup above and launch actual inference. Use `CHECKOUTCHECK_URL=http://127.0.0.1:8766` for an authorized AWS tunnel, or `CHECKOUTCHECK_BROWSER` for an existing Chromium executable. See [verification status](docs/implementation-status.md) for what each check establishes.
+The smoke check expects an empty transaction workspace. Perception/video checks require the original-data setup above and launch actual inference. Use `CHECKOUTCHECK_URL=http://127.0.0.1:8766` for an authorized AWS tunnel, or `CHECKOUTCHECK_BROWSER` for an existing Chromium executable. See the [technical report](docs/technical-report.md#build-test-and-reproduce) for verification scope and limitations.
 
 ## Commands
 
@@ -275,7 +275,7 @@ checkoutcheck/
 ├── apps/web/                  # Review interface, image overlays and video replay
 ├── checkoutcheck/             # API, evaluator, adapters, acquisition and CLI
 ├── tests/                     # Unit, API, original-data and browser checks
-├── docs/                      # Current status, roadmap, contracts and evidence notes
+├── docs/                      # Technical report, architecture, contracts and evaluation evidence
 ├── infra/                     # CPU container, CloudFormation and worker installation
 ├── .github/workflows/         # Source-only software CI
 ├── requirements.lock          # Pinned application dependencies
@@ -302,7 +302,7 @@ No LLM API key or AWS account is needed locally. Keep the operator application o
 
 The verified release is a private image/video engineering POC. Next steps are real checkout/POS evidence, stronger held-out detector evaluation, independent review and data-governance workflows, and external pilot testing. Accounts are deferred from the hackathon scope. Full community MVP acceptance remains open.
 
-The [roadmap](docs/roadmap.md) preserves the functional requirements and completion criteria. Team introduction, final video publication, judge access and competition submission still need completion; no award eligibility is claimed.
+The [technical report](docs/technical-report.md) records measured results and remaining acceptance requirements. The AWS review application and narrated product video are published; Devpost final submission remains a separate step.
 
 ## Contributing and Licensing
 

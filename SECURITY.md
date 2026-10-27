@@ -6,4 +6,4 @@ Keep AWS credentials outside source and containers. Private media, databases, mo
 
 To report a vulnerability, use GitHub's private vulnerability reporting feature if it is enabled for this repository. Otherwise contact the maintainer privately through their GitHub profile before sharing details. Do not disclose secrets, private recordings or exploit payloads in a public issue.
 
-No formal security audit or production-service support commitment is claimed. See the [roadmap](docs/roadmap.md) for the isolation, data-governance and operational requirements of a future community pilot.
+No formal security audit or production-service support commitment is claimed. See the [technical report](docs/technical-report.md#community-pilot-acceptance) for the isolation, data-governance and operational requirements of a future community pilot.

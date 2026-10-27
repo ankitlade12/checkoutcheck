@@ -25,6 +25,10 @@ See [architecture.md](architecture.md) and the packaged diagram. Personal-accoun
 
 CloudFront HTTPS now serves a separate read-only application on the EC2 host. Its origin permits CloudFront traffic only and checks a private origin header. The review container has no worker, no writable data mount and a query-only SQLite connection to a consistent snapshot. An API allowlist blocks mutation routes and private transaction media. Comparisons calculate existing scores without changing data. Results and database backups remain on EC2; no generated results are uploaded to S3. Health and browser checks verify the external HTTPS path, not just localhost.
 
+The five baseline measurements and agent run used t3.large; the review host was subsequently resized to t3.small. Its persistent shutdown timer ends hosting on **November 11, 2026 at 00:00 UTC (November 10 at 6 p.m. Central)**. See the [hosting guide](../infra/aws-public-review.md) for deployment, snapshot refresh and shutdown.
+
+SQLite online backup restoration passed an integrity check. Backups remain on the EC2 volume, so deleting that volume also deletes its backups. The first COCO attempt exceeded the original 180-second cap; the bounded worker limit was raised to 600 seconds and both neural workflows subsequently passed.
+
 ## Image evaluation and failure cases
 
 One-to-one matching uses IoU ≥ 0.5. The 24-image subset is exploratory, balanced across easy/medium/hard cases, and not an untouched final holdout. Raw exports include image-level predictions, explicit denominators, exclusions, hashes and scoring configuration. These measurements cannot establish population performance.
@@ -64,6 +68,8 @@ Dependencies are pinned in `requirements.lock`; the Dockerfile uses CPU-only PyT
 CHECKOUTCHECK_URL=https://d2pt18a0j9tuil.cloudfront.net python3 tests/browser_public_review.py
 ```
 
+The original-data environment passed 64 software tests covering validation, scoring, lifecycle, acquisition integrity and training provenance. Private AWS browser checks exercised all five image methods, cancellation, reload persistence, overlays, comparisons and exports; each image score was independently recomputed. All six original clips passed playback, seeking, source-time mapping, diagnostics, range requests and export. These checks observed zero JavaScript or HTTP errors.
+
 The package records the exact checks run. Browser verification covers actual stored runs, agent traces, comparisons, original video, mobile layout and blocked public mutations. Source-only CI skips checks whose licensed originals are not installed. Passing software checks is not evidence of real checkout accuracy.
 
 ## Responsible use and remaining limitations
@@ -73,3 +79,16 @@ Use the prototype for research and review. It must not infer intent, label a per
 Own application code is MIT licensed. RPC material remains CC BY-NC-SA 4.0; RetailAction retains the Standard.AI Dataset License. Copies and notices accompany redistributed material; neither dataset is relicensed as MIT. Organizer submission/reuse terms must be checked against these third-party licenses.
 
 The requested video uses Indian English male computer narration and a product-demo format. An opening team credit identifies Ankit Hemant Lade and Sai Jasti, with matching narration. The 4:11 video contains no live team footage; organizer acceptance of name credits for the team requirement is not confirmed. Award consideration is requested based on the provided evidence; eligibility and judging outcomes are not asserted. Devpost upload/final submission is a separate step and is not implied by preparing this package.
+
+## Community pilot acceptance
+
+The hackathon application is a single-operator workbench with a public read-only review service. Before a community pilot, record independent acceptance evidence for:
+
+- Consented synchronized checkout recordings, actual scan/void/payment events, independently reviewed physical inventory and measured alignment/drift tolerances. Follow the [capture protocol](real-dataset-sources.md#real-transaction-capture-protocol).
+- Supported product detection/tracking, calibrated uncertainty and independently frozen held-out evaluation; retain paired source sessions in the same split and report ambiguous/occluded cases.
+- Annotation revisions, reviewer disagreements, correction lineage, affected-result notices and rights-filtered reproducible exports.
+- Membership/revocation and cross-project isolation, aggregate quotas, interrupted-upload recovery, retention/withdrawal and deletion across derivatives and backups. Accounts remain outside the hackathon scope.
+- External onboarding, accessibility, security, load and recovery tests; versioned regression policies that distinguish model regressions, infrastructure failures and insufficient evidence.
+- Maintainer ownership, operational costs, contributor/support routes, practitioner feedback and substantiated product claims.
+
+Keep SQLite and the single worker until measured concurrency needs justify migration. Distributed workers would require leases, heartbeats, duplicate-delivery recovery and tested database migrations. For each acceptance gate, retain its artifact, environment, date, reviewer, measured outcome and limitations.

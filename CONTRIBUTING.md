@@ -10,7 +10,7 @@ Contributions that improve reproducibility, real-data inspection, detector evalu
 
 ## Data contributions
 
-Never add datasets, model weights, generated footage, invented scan logs or private annotation exports to Git. Discuss a source and its rights first, then use the [capture protocol](docs/capture-protocol.md) or [source registry](docs/real-dataset-sources.md). Evaluation permission does not automatically permit public distribution.
+Never add datasets, model weights, generated footage, invented scan logs or private annotation exports to Git. Discuss a source and its rights first, then use the [capture protocol](docs/real-dataset-sources.md#real-transaction-capture-protocol) or [source registry](docs/real-dataset-sources.md). Evaluation permission does not automatically permit public distribution.
 
 Temporary numeric/parser inputs are appropriate for software tests. They must not be installed as product evidence or presented as recorded transactions. An image box or shelf-action annotation does not establish scan or payment truth.
 

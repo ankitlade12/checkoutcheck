@@ -1,6 +1,6 @@
 # Original RPC photograph benchmark
 
-Measured locally on October 26, 2026. This document retains the macOS image results; see [AWS verification](aws-verification.md) for separately measured Linux execution. Neither experiment establishes real transaction accuracy.
+Measured locally on October 26, 2026. This document retains the macOS image results; see [AWS verification](technical-report.md#image-evaluation-and-failure-cases) for separately measured Linux execution. Neither experiment establishes real transaction accuracy.
 
 ## Source and selection
 
@@ -84,4 +84,4 @@ All mutations retain the local same-origin boundary. Image metrics and runs are 
 
 ## Remaining evidence
 
-The next model-development step is a stronger detector with documented real-only training provenance, then a separately frozen evaluation set. The next transaction step is consented checkout video synchronized with actual scan events and independent physical inventory labels. RPC images provide neither payment truth nor intervention outcomes, so they cannot establish discrepancy recall, shopper fairness, or reduced false interventions. Private AWS execution and evidence packaging are verified. Collaborative review, real transaction validation and final submission remain open; see the [roadmap](roadmap.md).
+The next model-development step is a stronger detector with documented real-only training provenance, then a separately frozen evaluation set. The next transaction step is consented checkout video synchronized with actual scan events and independent physical inventory labels. RPC images provide neither payment truth nor intervention outcomes, so they cannot establish discrepancy recall, shopper fairness, or reduced false interventions. Private AWS execution and evidence packaging are verified. Collaborative review, real transaction validation and final submission remain open; see the [technical report](technical-report.md#community-pilot-acceptance).
