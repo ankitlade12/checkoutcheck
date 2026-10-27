@@ -244,7 +244,7 @@ node --check apps/web/perception.js
 node --check apps/web/videos.js
 ```
 
-The verified original-data environment passes **64 tests**. Fresh-clone CI skips tests whose separately acquired originals or trained weights are absent; its result does not certify image/video accuracy. Temporary numeric and parser test inputs never populate the application as evidence.
+The verified original-data environment passes **71 tests**. Fresh-clone CI skips tests whose separately acquired originals or trained weights are absent; its result does not certify image/video accuracy. Temporary numeric and parser test inputs never populate the application as evidence.
 
 Browser checks require Playwright and Chromium installed separately:
 

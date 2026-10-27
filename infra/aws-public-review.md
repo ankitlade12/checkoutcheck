@@ -45,3 +45,13 @@ Browser verification requires Playwright and an installed Chromium browser (`CHE
 COOL reports are in `/opt/checkoutcheck/data/outputs/cool/`; their checksums and method are in [cool-evaluation.md](../docs/cool-evaluation.md). The temporary Graviton instance has been terminated. Its Marketplace agreement remains active, but the software is billed by running instance usage; no COOL instance is retained.
 
 Deploy source updates privately, rebuild both containers, refresh the snapshot, and repeat health/browser checks. Transfer generated evidence directly to EC2 when needed; do not upload results or backups to S3. Stopping EC2 makes both the application and video unavailable. After judging, delete the public-review stack to release its Elastic IP/distribution and ingress rule, then decide whether to retain the private stack's volume/bucket. Preserve required evidence before deleting storage.
+
+## Automatic teardown
+
+A separate `checkoutcheck-cleanup` stack prepares a project-scoped Lambda cleanup job. Its schedule is **disabled pending the owner's choice to download a local evidence backup or delete the EC2-only evidence**. The existing EC2 stop timer remains enabled. Do not describe full teardown as enabled until the schedule state has been verified.
+
+The proposed start is November 11, 2026 at 00:00 UTC. When enabled, the job runs every 30 minutes, checks the personal account and deadline, and deletes the public-review stack before the private worker stack. It then empties all versions, delete markers and incomplete multipart uploads from the project's retained S3 bucket and deletes that bucket. Failures leave the recurring job in place for retry; errors are recorded in `/aws/lambda/checkoutcheck-cleanup`. The schedule is independent of EC2 and does not require an open laptop or an active CLI session.
+
+After successful application/storage deletion, it deletes its own stack, removing the schedule, Lambda, logs and scheduler role. Its execution IAM role is retained so CloudFormation does not lose its permissions during teardown; that inactive role has no running compute or storage charges and can be removed manually afterward. The COOL benchmark instance is already terminated; the Marketplace agreement is separate and remains subscribed, with no running COOL instance.
+
+`infra/cleanup_handler.py` contains the cleanup logic; `tests/test_cleanup.py` checks deadline/account guards, dry-run behavior, deletion order and bucket errors without contacting AWS. The deployment-specific template and exact resource identifiers are kept in ignored `private-data/cleanup-template.json`. Use a Lambda invocation with `{"dry_run": true}` for read-only inspection. Recheck the schedule and deadline if judging is extended.
