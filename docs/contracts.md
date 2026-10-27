@@ -1,6 +1,6 @@
 # Input and output contracts
 
-These are format definitions, not a sample dataset. The application starts with no records.
+These are format definitions, not a sample dataset. A fresh installation starts with no records; the hosted review application contains completed evaluations.
 
 ## Inference inputs
 
@@ -59,7 +59,7 @@ Pairs require exactly two same-family, same-split, same-truth cases. Pair metric
 
 ## API
 
-Local route documentation is available at `/docs`, with the machine-readable specification at `/openapi.json`. Mutations require `X-CheckoutCheck: local`; browser requests must be same-origin. This is CSRF/DNS-rebinding mitigation for loopback development, **not authentication**.
+Local route documentation is available at `/docs`, with the machine-readable specification at `/openapi.json`. In the private operator workspace, mutations require `X-CheckoutCheck: local`; browser requests must be same-origin. This is CSRF/DNS-rebinding mitigation for loopback development, **not authentication**.
 
 | Route | Function |
 | --- | --- |
@@ -98,3 +98,15 @@ The original-video lab is a separate diagnostic workflow; it never registers a P
 | `GET /v1/videos/{id}/export` | Diagnostic JSON with source and annotation hashes; no media bytes |
 
 Video diagnostics use encoded frame index to map to the publisher's sampled source timestamps. Playback seconds and original source seconds are distinct fields. Publisher action intervals are mapped from normalized source duration, not from encoded playback duration. Missing action annotations remain missing.
+
+## Public review and benchmark evidence
+
+The hosted review service has no worker and uses a read-only database snapshot. Uploads, new runs, cancellation, fresh video analysis, private transaction records/media and `/openapi.json` are blocked. The route tables above describe the private operator API; they do not grant public access. Public image comparisons accept POST but only calculate scores from existing reports and do not mutate data.
+
+| Route | Function |
+| --- | --- |
+| `GET /v1/cool` | Availability, comparison and deployment metadata for the installed COOL benchmark |
+| `GET /v1/cool/{name}` | Download `stock`, `cool`, `comparison` or `deployment` JSON; missing artifacts return 404 |
+| `GET /licenses/{name}` | Serve the allowlisted RPC notice and RetailAction license/notice files |
+
+The adaptive vision agent uses the existing perception run endpoints; observations, decisions and tool calls are included in the run detail and export. See [agent evaluation](agentic-vision.md) and [COOL evidence](cool-evaluation.md).

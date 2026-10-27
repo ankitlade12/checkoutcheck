@@ -68,7 +68,7 @@ Dependencies are pinned in `requirements.lock`; the Dockerfile uses CPU-only PyT
 CHECKOUTCHECK_URL=https://d2pt18a0j9tuil.cloudfront.net python3 tests/browser_public_review.py
 ```
 
-The original-data environment passed 64 software tests covering validation, scoring, lifecycle, acquisition integrity and training provenance. Private AWS browser checks exercised all five image methods, cancellation, reload persistence, overlays, comparisons and exports; each image score was independently recomputed. All six original clips passed playback, seeking, source-time mapping, diagnostics, range requests and export. These checks observed zero JavaScript or HTTP errors.
+The original-data environment passed 71 software tests covering validation, scoring, lifecycle, acquisition integrity, training provenance and seven mocked teardown safety checks. The cleanup function also passed an AWS read-only dry run; actual deletion is scheduled, not yet executed. Private AWS browser checks exercised all five image methods, cancellation, reload persistence, overlays, comparisons and exports; each image score was independently recomputed. All six original clips passed playback, seeking, source-time mapping, diagnostics, range requests and export. These checks observed zero JavaScript or HTTP errors.
 
 The package records the exact checks run. Browser verification covers actual stored runs, agent traces, comparisons, original video, mobile layout and blocked public mutations. Source-only CI skips checks whose licensed originals are not installed. Passing software checks is not evidence of real checkout accuracy.
 

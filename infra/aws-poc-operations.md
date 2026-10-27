@@ -33,7 +33,7 @@ aws cloudformation describe-stacks --profile checkoutcheck-personal --region us-
   > private-data/aws-deployment.json
 ```
 
-The verified demonstration used a `t3.large`, standard CPU credits, a 40 GB encrypted volume, a two-hour stop timer on every boot and a $10 monthly budget alert. The alert fires at 80% of that threshold; it is not enforcement. Record the resolved AMI, instance, bucket and log group from your actual stack.
+The original inference evaluation used a `t3.large`, standard CPU credits, a 40 GB encrypted volume, a two-hour stop timer on every boot and a $10 monthly budget alert. The current judge host uses `t3.small` and a fixed end date with automatic teardown; see the [public hosting guide](aws-public-review.md#automatic-teardown). The alert fires at 80% of that threshold; it is not enforcement. Record the resolved AMI, instance, bucket and log group from your actual stack.
 
 ## Install source and authorized originals
 
@@ -69,7 +69,7 @@ aws ssm start-session --profile checkoutcheck-personal --region us-east-1 \
 
 Open `http://127.0.0.1:8766`. Browser scripts accept `CHECKOUTCHECK_URL=http://127.0.0.1:8766`. Verify actual inference, exports, container health and CloudWatch log delivery. Record builds, model/source hashes and measured timings; do not relabel local reports as cloud results. The bounded image-worker timeout is ten minutes to accommodate burst-limited CPU execution.
 
-Use an arranged screen share or an authorized operator for judges. Never open the login-free write endpoint publicly. SSM port-forwarding traffic itself is not an application audit trail.
+Judges can inspect completed results through the [public review application](https://d2pt18a0j9tuil.cloudfront.net). New execution requires the private operator workspace. Never open the login-free write endpoint publicly. SSM port-forwarding traffic itself is not an application audit trail.
 
 ## Backup and shutdown
 
@@ -82,4 +82,4 @@ aws ec2 wait instance-stopped --profile checkoutcheck-personal --region us-east-
   --instance-ids YOUR_INSTANCE_ID
 ```
 
-Stopping preserves the root volume and results. Deleting the stack terminates the instance and deletes that volume, including any EC2-only backup. The S3 bucket and object versions are retained deliberately and require separate cleanup. Neither shutdown nor stack deletion implies zero cost or complete data deletion.
+Stopping preserves the root volume and results. Deleting the stack terminates the instance and deletes that volume, including any EC2-only backup. The S3 bucket and object versions are retained deliberately and require separate cleanup. Neither shutdown nor stack deletion alone implies zero cost or complete data deletion. For the current deployment, the enabled [cleanup job](aws-public-review.md#automatic-teardown) also deletes the retained versioned bucket after the application stacks; the owner authorized permanent cloud evidence deletion without a backup.

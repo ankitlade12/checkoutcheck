@@ -3,7 +3,7 @@
 Current endpoint: https://d2pt18a0j9tuil.cloudfront.net  
 Product video: https://d2pt18a0j9tuil.cloudfront.net/demo
 
-The judge window ends **November 11, 2026 at 00:00 UTC** (November 10 at 6 p.m. Central). A persistent systemd timer stops EC2 then, and an enabled independent cleanup schedule begins permanent project teardown without a backup. Deletion proceeds in stages; resources can incur charges until AWS finishes deleting them. The existing budget alert is not a hard spending cap. Extend the timer deliberately if judging requires a later date. Keep the host small for read-only review and resize before expensive new inference.
+The judge window ends **November 11, 2026 at 00:00 UTC** (November 10 at 6 p.m. Central). A persistent systemd timer stops EC2 then, and an enabled independent cleanup schedule begins permanent project teardown without a backup. Deletion proceeds in stages; resources can incur charges until AWS finishes deleting them. The existing budget alert is not a hard spending cap. If judging is extended, update the EC2 stop timer, Scheduler start date and cleanup Lambda `not_before` guard together; changing only the timer will not prevent teardown. Keep the host small for read-only review and resize before expensive new inference.
 
 ## Design
 

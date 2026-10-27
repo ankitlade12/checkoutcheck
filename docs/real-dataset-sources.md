@@ -4,7 +4,7 @@ Reviewed October 26, 2026. This is a targeted source review, not an exhaustive i
 
 ## Acquired original videos
 
-The user requested internet videos. `python -m checkoutcheck.retail_video --groups 3` streams the publisher's validation archive and retains the first three complete groups: two original camera clips and the unmodified metadata per group. All six videos preserve publisher face blurring. These are 176 selected frames in total, not six continuous checkout transactions. No POS, payment, discrepancy, demographic or identity labels were invented.
+`python -m checkoutcheck.retail_video --groups 3` streams the publisher's validation archive and retains the first three complete groups: two original camera clips and the unmodified metadata per group. All six videos preserve publisher face blurring. These are 176 selected frames in total, not six continuous checkout transactions. No POS, payment, discrepancy, demographic or identity labels were invented.
 
 The Real-video lab at `http://127.0.0.1:8765/#videos` plays the original MP4s, preserves publisher source-time mapping, displays publisher interaction points and runs OpenCV frame-difference/sharpness diagnostics. Two clips have no action annotations; the UI explicitly shows this missing annotation state. Publisher action labels are separate from computed diagnostics.
 
