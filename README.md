@@ -3,7 +3,7 @@
 [![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![OpenCV 5](https://img.shields.io/badge/OpenCV-5.0-5C3EE8.svg?logo=opencv&logoColor=white)](https://opencv.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![AWS](https://img.shields.io/badge/AWS-HTTPS%20demo-FF9900.svg)](docs/technical-report.md)
+[![AWS](https://img.shields.io/badge/AWS-HTTPS%20demo-FF9900.svg)](https://d2pt18a0j9tuil.cloudfront.net)
 [![CI](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml/badge.svg)](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 
@@ -12,6 +12,8 @@
 CheckoutCheck is an evidence workbench for engineers evaluating camera-assisted checkout systems. It brings original photographs and videos, model predictions, reference annotations and reproducible evaluation into one inspectable application.
 
 The working hackathon POC includes five image baselines, an adaptive vision agent, an original-video lab and a separately implemented transaction evaluator. Image and video workflows have been exercised locally and on AWS. Real synchronized checkout/POS validation remains an open requirement.
+
+**[Open the live application](https://d2pt18a0j9tuil.cloudfront.net)** · [Watch the product demo](https://d2pt18a0j9tuil.cloudfront.net/demo) · [Technical report](docs/technical-report.md)
 
 **Hackathon:** [OpenCV 2026](https://opencv26.devpost.com/)
 
@@ -33,14 +35,14 @@ The working hackathon POC includes five image baselines, an adaptive vision agen
 | Surface | Address or entry point | Access |
 | --- | --- | --- |
 | Product demo · 4:11 | [Watch with Indian English narration](https://d2pt18a0j9tuil.cloudfront.net/demo) | Working product, architecture and principal results |
-| Public judge demo | [Open CheckoutCheck](https://d2pt18a0j9tuil.cloudfront.net) | Inspect results, agent traces, original clips and COOL evidence |
+| Live application | [Open CheckoutCheck](https://d2pt18a0j9tuil.cloudfront.net) | Inspect results, agent traces, original clips and COOL evidence |
 | Local application | <http://127.0.0.1:8765> | Start `./run.command` after installation |
-| Real-data lab | <http://127.0.0.1:8765/#perception> | Requires acquired RPC originals |
-| Real-video lab | <http://127.0.0.1:8765/#videos> | Requires acquired RetailAction originals |
-| AWS application | <http://127.0.0.1:8766> | Your deployed stack plus an authorized SSM tunnel |
+| Live real-data lab | [Inspect image results](https://d2pt18a0j9tuil.cloudfront.net/#perception) | Completed methods, overlays and comparisons |
+| Live real-video lab | [Explore original clips](https://d2pt18a0j9tuil.cloudfront.net/#videos) | Playback, source frames and diagnostics |
+| Private AWS operator tunnel | <http://127.0.0.1:8766> | Your deployed stack plus an authorized SSM tunnel |
 | Health check | `/v1/health` | Database and worker readiness |
 | API contracts | [`docs/contracts.md`](docs/contracts.md) | Also served at `/docs` |
-| Cloud verification | [`docs/technical-report.md`](docs/technical-report.md) | Recorded measurements and limitations |
+| Technical report | [`docs/technical-report.md`](docs/technical-report.md) | Recorded measurements and limitations |
 
 The HTTPS judge demo exposes completed evidence through a separate read-only service. Execution and uploads remain in the private operator workspace. A fresh clone contains no datasets, weights or credentials. See the [technical report](docs/technical-report.md), [agent evaluation](docs/agentic-vision.md), [COOL benchmark](docs/cool-evaluation.md) and [public hosting guide](infra/aws-public-review.md).
 
@@ -213,13 +215,15 @@ Downloads and training artifacts stay in ignored `private-data/`. Training refus
 
 ### Judge Walkthrough
 
-1. Open **Real-data lab** and run an installed method.
+1. Open the [live application](https://d2pt18a0j9tuil.cloudfront.net/#perception) and select a completed method in **Real-data lab**.
 2. Inspect matched objects, misses, precision, recall and count errors.
 3. Toggle reference boxes and model predictions on an original photo.
 4. Compare two completed methods on the same registered dataset.
 5. Export a report and recompute its score with the CLI.
 6. Open **Real-video lab**, play an original clip and seek by source frame.
-7. Read the supported conditions before interpreting any transaction result.
+7. Inspect the agent trace and COOL benchmark evidence. Read the supported conditions before interpreting any transaction result.
+
+The public application supports inspection and exports. To launch new inference or upload inputs, use your local installation or private operator tunnel.
 
 ### Docker and AWS
 
@@ -300,7 +304,7 @@ No LLM API key or AWS account is needed locally. Keep the operator application o
 
 ## Roadmap and Known Limits
 
-The verified release is a private image/video engineering POC. Next steps are real checkout/POS evidence, stronger held-out detector evaluation, independent review and data-governance workflows, and external pilot testing. Accounts are deferred from the hackathon scope. Full community MVP acceptance remains open.
+The release includes a public review application and a private execution workspace. Next steps are real checkout/POS evidence, stronger held-out detector evaluation, independent review and data-governance workflows, and external pilot testing. Accounts are deferred from the hackathon scope. Full community MVP acceptance remains open.
 
 The [technical report](docs/technical-report.md) records measured results and remaining acceptance requirements. The AWS review application and narrated product video are published; Devpost final submission remains a separate step.
 
