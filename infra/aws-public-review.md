@@ -3,7 +3,7 @@
 Current endpoint: https://d2pt18a0j9tuil.cloudfront.net  
 Product video: https://d2pt18a0j9tuil.cloudfront.net/demo
 
-The judge window ends **November 3, 2026 at 00:00 UTC** (November 2 at 6 p.m. Central). A persistent systemd timer stops EC2 then. Retained EBS, the Elastic IP and other retained resources can still incur charges; the existing budget alert is not a hard spending cap. Extend the timer deliberately if judging requires a later date. Keep the host small for read-only review and resize before expensive new inference.
+The judge window ends **November 11, 2026 at 00:00 UTC** (November 10 at 6 p.m. Central). A persistent systemd timer stops EC2 then. Retained EBS, the Elastic IP and other retained resources can still incur charges; the existing budget alert is not a hard spending cap. Extend the timer deliberately if judging requires a later date. Keep the host small for read-only review and resize before expensive new inference.
 
 ## Design
 
