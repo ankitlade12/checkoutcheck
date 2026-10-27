@@ -25,7 +25,7 @@ See [architecture.md](architecture.md) and the packaged diagram. Personal-accoun
 
 CloudFront HTTPS now serves a separate read-only application on the EC2 host. Its origin permits CloudFront traffic only and checks a private origin header. The review container has no worker, no writable data mount and a query-only SQLite connection to a consistent snapshot. An API allowlist blocks mutation routes and private transaction media. Comparisons calculate existing scores without changing data. Results and database backups remain on EC2; no generated results are uploaded to S3. Health and browser checks verify the external HTTPS path, not just localhost.
 
-The five baseline measurements and agent run used t3.large; the review host was subsequently resized to t3.small. Its persistent shutdown timer ends hosting on **November 11, 2026 at 00:00 UTC (November 10 at 6 p.m. Central)**. See the [hosting guide](../infra/aws-public-review.md) for deployment, snapshot refresh and shutdown.
+The five baseline measurements and agent run used t3.large; the review host was subsequently resized to t3.small. Its persistent shutdown timer and enabled automatic teardown schedule end hosting on **November 11, 2026 at 00:00 UTC (November 10 at 6 p.m. Central)**. The owner authorized permanent deletion of cloud resources and evidence without a backup. See the [hosting guide](../infra/aws-public-review.md) for deployment, snapshot refresh, teardown scope and exceptions.
 
 SQLite online backup restoration passed an integrity check. Backups remain on the EC2 volume, so deleting that volume also deletes its backups. The first COCO attempt exceeded the original 180-second cap; the bounded worker limit was raised to 600 seconds and both neural workflows subsequently passed.
 

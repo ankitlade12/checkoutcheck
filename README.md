@@ -44,6 +44,8 @@ The working hackathon POC includes five image baselines, an adaptive vision agen
 | API contracts | [`docs/contracts.md`](docs/contracts.md) | Also served at `/docs` |
 | Technical report | [`docs/technical-report.md`](docs/technical-report.md) | Recorded measurements and limitations |
 
+**Hosting ends November 10, 2026 at 6 p.m. Central.** Automatic AWS teardown is enabled for that deadline, including permanent deletion of cloud evidence without a backup. See the [cleanup scope and exceptions](infra/aws-public-review.md#automatic-teardown).
+
 The HTTPS judge demo exposes completed evidence through a separate read-only service. Execution and uploads remain in the private operator workspace. A fresh clone contains no datasets, weights or credentials. See the [technical report](docs/technical-report.md), [agent evaluation](docs/agentic-vision.md), [COOL benchmark](docs/cool-evaluation.md) and [public hosting guide](infra/aws-public-review.md).
 
 ## The Problem

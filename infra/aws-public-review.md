@@ -3,7 +3,7 @@
 Current endpoint: https://d2pt18a0j9tuil.cloudfront.net  
 Product video: https://d2pt18a0j9tuil.cloudfront.net/demo
 
-The judge window ends **November 11, 2026 at 00:00 UTC** (November 10 at 6 p.m. Central). A persistent systemd timer stops EC2 then. Retained EBS, the Elastic IP and other retained resources can still incur charges; the existing budget alert is not a hard spending cap. Extend the timer deliberately if judging requires a later date. Keep the host small for read-only review and resize before expensive new inference.
+The judge window ends **November 11, 2026 at 00:00 UTC** (November 10 at 6 p.m. Central). A persistent systemd timer stops EC2 then, and an enabled independent cleanup schedule begins permanent project teardown without a backup. Deletion proceeds in stages; resources can incur charges until AWS finishes deleting them. The existing budget alert is not a hard spending cap. Extend the timer deliberately if judging requires a later date. Keep the host small for read-only review and resize before expensive new inference.
 
 ## Design
 
@@ -44,13 +44,13 @@ Browser verification requires Playwright and an installed Chromium browser (`CHE
 
 COOL reports are in `/opt/checkoutcheck/data/outputs/cool/`; their checksums and method are in [cool-evaluation.md](../docs/cool-evaluation.md). The temporary Graviton instance has been terminated. Its Marketplace agreement remains active, but the software is billed by running instance usage; no COOL instance is retained.
 
-Deploy source updates privately, rebuild both containers, refresh the snapshot, and repeat health/browser checks. Transfer generated evidence directly to EC2 when needed; do not upload results or backups to S3. Stopping EC2 makes both the application and video unavailable. After judging, delete the public-review stack to release its Elastic IP/distribution and ingress rule, then decide whether to retain the private stack's volume/bucket. Preserve required evidence before deleting storage.
+Deploy source updates privately, rebuild both containers, refresh the snapshot, and repeat health/browser checks. Transfer generated evidence directly to EC2 when needed; do not upload results or backups to S3. Stopping EC2 makes both the application and video unavailable. The owner authorized permanent deletion of project resources and evidence without a backup after judging; the automatic teardown below handles the application stacks and retained bucket.
 
 ## Automatic teardown
 
-A separate `checkoutcheck-cleanup` stack prepares a project-scoped Lambda cleanup job. Its schedule is **disabled pending the owner's choice to download a local evidence backup or delete the EC2-only evidence**. The existing EC2 stop timer remains enabled. Do not describe full teardown as enabled until the schedule state has been verified.
+The separate `checkoutcheck-cleanup` stack runs a project-scoped Lambda cleanup job. Its schedule is **enabled**, verified through AWS Scheduler after the CloudFormation update completed. The owner explicitly authorized permanent deletion of project resources and evidence, with no backup. The existing EC2 stop timer also remains enabled.
 
-The proposed start is November 11, 2026 at 00:00 UTC. When enabled, the job runs every 30 minutes, checks the personal account and deadline, and deletes the public-review stack before the private worker stack. It then empties all versions, delete markers and incomplete multipart uploads from the project's retained S3 bucket and deletes that bucket. Failures leave the recurring job in place for retry; errors are recorded in `/aws/lambda/checkoutcheck-cleanup`. The schedule is independent of EC2 and does not require an open laptop or an active CLI session.
+The scheduled start is **November 10, 2026 at 6 p.m. Central (November 11 at 00:00 UTC)**. The job runs every 30 minutes, checks the personal account and deadline, and deletes the public-review stack before the private worker stack. It then empties all versions, delete markers and incomplete multipart uploads from the project's retained S3 bucket and deletes that bucket. Failures leave the recurring job in place for retry; errors are recorded in `/aws/lambda/checkoutcheck-cleanup`. The schedule is independent of EC2 and does not require an open laptop or an active CLI session.
 
 After successful application/storage deletion, it deletes its own stack, removing the schedule, Lambda, logs and scheduler role. Its execution IAM role is retained so CloudFormation does not lose its permissions during teardown; that inactive role has no running compute or storage charges and can be removed manually afterward. The COOL benchmark instance is already terminated; the Marketplace agreement is separate and remains subscribed, with no running COOL instance.
 
