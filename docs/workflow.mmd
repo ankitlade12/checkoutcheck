@@ -1,0 +1,29 @@
+flowchart LR
+    subgraph S1["STEP 1: ORIGINAL INPUTS"]
+      I["Original RPC validation photographs"] --> V["Verify source manifest and checksums"]
+    end
+    subgraph S2["STEP 2: PERCEPTION"]
+      V --> O["OpenCV 5: decode, sharpness, foreground"]
+      O --> P{"Observed quality and density"}
+      P -->|Dense or warning| N["RPC neural detector"]
+      P -->|Clear foreground| W["OpenCV watershed"]
+    end
+    subgraph S3["STEP 3: DECISION + TRACE"]
+      N --> T["Record observations, selected tool and timings"]
+      W --> T
+      P -->|Low sharpness| H["Recommend human inspection"]
+      T -->|Failure or count disagreement| H
+    end
+    subgraph S4["STEP 4: EVALUATE + REVIEW"]
+      T --> E["Score predictions against reference annotations"]
+      R["Reference labels: scoring only"] --> E
+      E --> X["Inspect overlays, compare and export"]
+      H --> X
+    end
+    style I fill:#e1f5ff,stroke:#0288d1
+    style O fill:#fff4e1,stroke:#f57c00
+    style P fill:#fff4e1,stroke:#f57c00
+    style T fill:#f3e5f5,stroke:#7b1fa2
+    style H fill:#fce4ec,stroke:#c2185b
+    style E fill:#c8e6c9,stroke:#388e3c
+    style X fill:#c8e6c9,stroke:#388e3c

@@ -52,40 +52,85 @@ CheckoutCheck keeps image perception, source-video diagnostics and transaction e
 
 ## Architecture Overview
 
-### Evaluation Flow
+### High-Level Workflow
 
 ```mermaid
 flowchart LR
-    O[Original media and permitted inputs] --> M[Model inference]
-    M --> P[Predictions]
-    R[Independent reference annotations] --> E[Deterministic evaluator]
-    P --> E
-    E --> V[Replay and compatible comparison]
-    V --> X[Export and recompute scores]
+    subgraph S1["STEP 1: ORIGINAL INPUTS"]
+      I["Original RPC validation photographs"] --> V["Verify source manifest and checksums"]
+    end
+    subgraph S2["STEP 2: PERCEPTION"]
+      V --> O["OpenCV 5: decode, sharpness, foreground"]
+      O --> P{"Observed quality and density"}
+      P -->|Dense or warning| N["RPC neural detector"]
+      P -->|Clear foreground| W["OpenCV watershed"]
+    end
+    subgraph S3["STEP 3: DECISION + TRACE"]
+      N --> T["Record observations, selected tool and timings"]
+      W --> T
+      P -->|Low sharpness| H["Recommend human inspection"]
+      T -->|Failure or count disagreement| H
+    end
+    subgraph S4["STEP 4: EVALUATE + REVIEW"]
+      T --> E["Score predictions against reference annotations"]
+      R["Reference labels: scoring only"] --> E
+      E --> X["Inspect overlays, compare and export"]
+      H --> X
+    end
+    style I fill:#e1f5ff,stroke:#0288d1
+    style O fill:#fff4e1,stroke:#f57c00
+    style P fill:#fff4e1,stroke:#f57c00
+    style T fill:#f3e5f5,stroke:#7b1fa2
+    style H fill:#fce4ec,stroke:#c2185b
+    style E fill:#c8e6c9,stroke:#388e3c
+    style X fill:#c8e6c9,stroke:#388e3c
 ```
 
-### Private Runtime
+### System Architecture
 
 ```mermaid
 flowchart TB
-    B[Browser] --> L[Local loopback or IAM-authorized SSM tunnel]
-    L --> API[FastAPI and static web UI]
-    API --> DB[(SQLite metadata and job queue)]
-    DB --> W[Single bounded worker]
-    W --> CV[OpenCV preprocessing and classical methods]
-    W --> NN[CPU PyTorch detector]
-    D[Original files and model manifests] --> W
-    CV --> E[Scoring and provenance]
-    NN --> E
-    E --> DB
-    subgraph AWS deployment
-      EC2[EC2 host and scoped instance role]
-      S3[(Private encrypted input artifacts)]
-      CW[CloudWatch application logs]
-      EC2 --> S3
-      EC2 --> CW
+    J["JUDGE / COMMUNITY BROWSER"]
+    U["PRIVATE OPERATOR"]
+    subgraph ACCESS["ACCESS + APPLICATION LAYER"]
+      CF["CloudFront HTTPS + restricted nginx origin"]
+      RO["Read-only FastAPI service / no worker"]
+      SSM["IAM-authorized Session Manager"]
+      API["Private FastAPI / uploads and job requests"]
     end
-    API -. hosted on .-> EC2
+    subgraph CORE["CORE VISION + EVALUATION SERVICES — EC2"]
+      Q["SQLite queue + bounded worker"]
+      CV["OpenCV 5 preprocessing and diagnostics"]
+      A["Deterministic vision agent / max 3 calls"]
+      D["Watershed or PyTorch detector"]
+      E["Evaluator / reference labels enter here"]
+      H["Human inspection recommendation + trace"]
+    end
+    subgraph DATA["STORAGE + OBSERVABILITY"]
+      S3["Private encrypted S3 / original inputs + weights"]
+      DB["EC2 volume / SQLite results + backups"]
+      SNAP["Read-only SQLite review snapshot"]
+      CW["CloudWatch application logs"]
+    end
+    subgraph BENCH["SEPARATE COOL BENCHMARK"]
+      G["Official COOL / c8g.large Graviton"]
+      B["Same real inputs + pipelines / stock baseline"]
+      F["Reports retained on project EC2 / benchmark instance terminated"]
+    end
+    J --> CF --> RO --> SNAP
+    U --> SSM --> API --> Q --> CV --> A --> D --> E --> DB
+    A --> H
+    S3 --> Q
+    Q --> CW
+    DB --> SNAP
+    G --> B --> F --> DB
+    style J fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    style U fill:#e1f5ff,stroke:#0288d1
+    style CV fill:#fff4e1,stroke:#f57c00,stroke-width:2px
+    style A fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style E fill:#c8e6c9,stroke:#388e3c
+    style H fill:#fce4ec,stroke:#c2185b
+    style G fill:#ffe0b2,stroke:#e64a19,stroke-width:2px
 ```
 
 Reference labels enter the evaluator after inference. This data-flow boundary does not sandbox hostile model code; arbitrary executable adapters are unsupported. See the [architecture notes](docs/architecture.md).

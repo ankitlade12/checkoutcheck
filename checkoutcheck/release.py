@@ -160,7 +160,7 @@ This is a prepared local package, not an uploaded or accepted competition submis
         readme=output/'README.md'
         readme.write_text(readme.read_text().replace('AWS execution and the human team/video/judge-access steps remain pending.', 'AWS execution evidence is included. The human team/video/judge-access steps remain pending.'))
     # Submission documents share the reviewed repository source of truth.
-    for name in ('technical-report.md','architecture.mmd','architecture.svg','agentic-vision.md','cool-evaluation.md'):
+    for name in ('technical-report.md','architecture.mmd','architecture.svg','workflow.mmd','workflow.svg','agentic-vision.md','cool-evaluation.md'):
         source=root/'docs'/name
         if source.is_file():(output/name).write_bytes(source.read_bytes())
     (output/'demo-script.md').write_text('The reproducible product-demo recorder is tests/record_submission_demo.py. It uses Indian English male narration and actual AWS application scenes. Opening credits identify Ankit Hemant Lade and Sai Jasti. No live team footage is included; organizer acceptance of name credits is not confirmed.\n')

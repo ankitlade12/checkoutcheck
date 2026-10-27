@@ -1,19 +1,42 @@
-flowchart TD
-    Judge[Judge browser] --> CF[CloudFront HTTPS]
-    CF --> Review[EC2 read-only review service]
-    Review --> Snapshot[(SQLite review snapshot)]
-    Operator[Private operator via IAM / SSM] --> API[FastAPI and SQLite queue]
-    API --> Worker[Bounded worker]
-    S3[Private S3 original inputs and weights] --> Worker
-    Worker --> CV[OpenCV 5 preprocessing and diagnostics]
-    CV --> Agent{Observe and select next tool}
-    Agent --> Watershed[OpenCV watershed]
-    Agent --> Neural[PyTorch detector]
-    Watershed --> Eval[Evaluator; reference annotations enter here]
-    Neural --> Eval
-    Eval --> API
-    API --> Snapshot
-    Agent --> Human[Human inspection; no automatic enforcement]
-    Worker --> Logs[CloudWatch]
-    COOL[Temporary official COOL on Graviton] --> Baseline[Actual pipelines vs stock OpenCV]
-    Baseline --> Snapshot
+flowchart TB
+    J["JUDGE / COMMUNITY BROWSER"]
+    U["PRIVATE OPERATOR"]
+    subgraph ACCESS["ACCESS + APPLICATION LAYER"]
+      CF["CloudFront HTTPS + restricted nginx origin"]
+      RO["Read-only FastAPI service / no worker"]
+      SSM["IAM-authorized Session Manager"]
+      API["Private FastAPI / uploads and job requests"]
+    end
+    subgraph CORE["CORE VISION + EVALUATION SERVICES — EC2"]
+      Q["SQLite queue + bounded worker"]
+      CV["OpenCV 5 preprocessing and diagnostics"]
+      A["Deterministic vision agent / max 3 calls"]
+      D["Watershed or PyTorch detector"]
+      E["Evaluator / reference labels enter here"]
+      H["Human inspection recommendation + trace"]
+    end
+    subgraph DATA["STORAGE + OBSERVABILITY"]
+      S3["Private encrypted S3 / original inputs + weights"]
+      DB["EC2 volume / SQLite results + backups"]
+      SNAP["Read-only SQLite review snapshot"]
+      CW["CloudWatch application logs"]
+    end
+    subgraph BENCH["SEPARATE COOL BENCHMARK"]
+      G["Official COOL / c8g.large Graviton"]
+      B["Same real inputs + pipelines / stock baseline"]
+      F["Reports retained on project EC2 / benchmark instance terminated"]
+    end
+    J --> CF --> RO --> SNAP
+    U --> SSM --> API --> Q --> CV --> A --> D --> E --> DB
+    A --> H
+    S3 --> Q
+    Q --> CW
+    DB --> SNAP
+    G --> B --> F --> DB
+    style J fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    style U fill:#e1f5ff,stroke:#0288d1
+    style CV fill:#fff4e1,stroke:#f57c00,stroke-width:2px
+    style A fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style E fill:#c8e6c9,stroke:#388e3c
+    style H fill:#fce4ec,stroke:#c2185b
+    style G fill:#ffe0b2,stroke:#e64a19,stroke-width:2px
