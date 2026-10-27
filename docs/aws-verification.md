@@ -31,7 +31,7 @@ The recorded AWS walkthrough is a private local artifact under `artifacts/aws-de
 
 ## Public review, Agentic Vision and COOL update
 
-The current [HTTPS judge endpoint](https://d2pt18a0j9tuil.cloudfront.net) serves a separate read-only container and the [4:05 narrated product demo](https://d2pt18a0j9tuil.cloudfront.net/demo). The host is now t3.small for review; the original five baseline measurements above were made on t3.large. A persistent shutdown timer ends the review window on November 3, 2026 at 00:00 UTC. CloudFront and a stable Elastic IP preserve the endpoint across the resize. The origin accepts only CloudFront traffic and verifies a private header; public mutations/private transaction media are blocked.
+The current [HTTPS judge endpoint](https://d2pt18a0j9tuil.cloudfront.net) serves a separate read-only container and the [4:11 narrated product demo](https://d2pt18a0j9tuil.cloudfront.net/demo). The host is now t3.small for review; the original five baseline measurements above were made on t3.large. A persistent shutdown timer ends the review window on November 3, 2026 at 00:00 UTC. CloudFront and a stable Elastic IP preserve the endpoint across the resize. The origin accepts only CloudFront traffic and verifies a private header; public mutations/private transaction media are blocked.
 
 The actual agent run on t3.large completed all 24 images: 18 neural routes, six watershed routes, 17 inspection recommendations, 72 tool calls and zero budget violations. It scored 94 true positives, 53 false positives and 197 misses. This is lower recall than the trained detector alone. See [agent evaluation](agentic-vision.md).
 

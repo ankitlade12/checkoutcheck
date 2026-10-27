@@ -20,6 +20,8 @@ if (local_browsers/'ffmpeg-1011').exists():
     os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', str(local_browsers))
 
 SCENES = [
+    ('team', 'The team behind CheckoutCheck',
+     'CheckoutCheck. Built by Ankit Hemant Lade and Sai Jasti.'),
     ('problem', 'A camera sees an item. Did the checkout agree?',
      'At self checkout, seeing a product is only half the problem. Was it scanned? Is it the right item? And when the picture is unclear, should a person step in? An unreliable alert can frustrate an honest customer. CheckoutCheck is an open evaluation workbench that helps teams inspect the evidence before trusting a checkout vision system. Let us see the working prototype.'),
     ('detection', 'See the result. Inspect the misses.',
@@ -47,14 +49,16 @@ def card(title, subtitle, architecture=False):
     .brand{font-size:23px;letter-spacing:1px;color:#bbd6ab;margin-bottom:50px}h1{font-size:64px;line-height:1.08;max-width:1050px;margin:0 0 30px;letter-spacing:-2px}
     p{font-size:26px;color:#d1ded2;line-height:1.5;max-width:1000px;margin:0}footer{margin-top:50px;font-size:18px;color:#bbd6ab}
     .flow{display:flex;flex-direction:column;gap:12px;margin:8px 0;font-size:23px}.flow b{background:#23463c;padding:14px 20px;border-left:4px solid #c4de82}.flow span{color:#cfddc8;font-size:19px;padding-left:22px}
-    </style></head><body><main><div class="brand">▣ CHECKOUTCHECK</div><h1>'''+html.escape(title)+'''</h1><p>'''+html.escape(subtitle)+'''</p>'''+flow+'''<footer>OpenCV AI Competition 2026 · Working research prototype</footer></main></body></html>'''
+    </style></head><body><main><div class="brand">▣ CHECKOUTCHECK</div><h1>'''+html.escape(title)+'''</h1><p>'''+html.escape(subtitle)+'''</p>'''+flow+'''<footer>OpenCV AI Competition 2026 · Powered by AWS</footer></main></body></html>'''
 
 
 def duration(path):
     return float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=nw=1:nk=1', str(path)], text=True))
 
 
+selected_scenes = set(os.environ.get('CHECKOUTCHECK_SCENES', ','.join(s[0] for s in SCENES)).split(','))
 for key, _, speech in SCENES:
+    if key not in selected_scenes: continue
     (OUTPUT/(key+'.txt')).write_text(speech+'\n')
     subprocess.run(['say', '-v', 'Rishi', '-r', '155', '-f', str(OUTPUT/(key+'.txt')), '-o', str(OUTPUT/(key+'.aiff'))], check=True)
 (OUTPUT/'narration.json').write_text(json.dumps(SCENES, indent=2)+'\n')
@@ -62,14 +66,15 @@ for key, _, speech in SCENES:
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=os.environ.get('CHECKOUTCHECK_BROWSER'), headless=True)
     for key, title, _ in SCENES:
+        if key not in selected_scenes: continue
         context = browser.new_context(viewport={'width': 1280, 'height': 800}, record_video_dir=str(OUTPUT/key), record_video_size={'width':1280,'height':800})
         page = context.new_page()
         errors = []
         page.on('pageerror', lambda error: errors.append(str(error)))
         started = time.monotonic()
         length = duration(OUTPUT/(key+'.aiff'))+2
-        if key in ('problem', 'architecture', 'community'):
-            subtitles = {'problem':'Inspect what the camera sees. Measure what the system misses.',
+        if key in ('team', 'problem', 'architecture', 'community'):
+            subtitles = {'team':'Ankit Hemant Lade · Sai Jasti', 'problem':'Inspect what the camera sees. Measure what the system misses.',
                          'architecture':'Measured inference · auditable decisions · human inspection',
                          'community':'github.com/ankitlade12/checkoutcheck\nOriginal data. Reproducible scores. Visible limitations.'}
             page.set_content(card(title, subtitles[key], key=='architecture'))
@@ -121,4 +126,4 @@ with sync_playwright() as p:
 final = OUTPUT/'checkoutcheck-product-demo.mp4'
 subprocess.run(['ffmpeg','-y','-loglevel','error','-f','concat','-safe','0','-i',str(OUTPUT/'concat.txt'),'-c','copy','-movflags','+faststart',str(final)],check=True)
 assert duration(final) <= 300, 'Submission video exceeds five minutes'
-print(json.dumps({'video':str(final),'duration_seconds':duration(final),'voice':'Rishi, English (India)','team_appearance':False}))
+print(json.dumps({'video':str(final),'duration_seconds':duration(final),'voice':'Rishi, English (India)','team_credits':['Ankit Hemant Lade','Sai Jasti'],'live_team_footage':False}))

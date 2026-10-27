@@ -32,7 +32,7 @@ The working hackathon POC includes five image baselines, an adaptive vision agen
 
 | Surface | Address or entry point | Access |
 | --- | --- | --- |
-| Product demo · 4:05 | [Watch with Indian English narration](https://d2pt18a0j9tuil.cloudfront.net/demo) | Working product, architecture and principal results |
+| Product demo · 4:11 | [Watch with Indian English narration](https://d2pt18a0j9tuil.cloudfront.net/demo) | Working product, architecture and principal results |
 | Public judge demo | [Open CheckoutCheck](https://d2pt18a0j9tuil.cloudfront.net) | Inspect results, agent traces, original clips and COOL evidence |
 | Local application | <http://127.0.0.1:8765> | Start `./run.command` after installation |
 | Real-data lab | <http://127.0.0.1:8765/#perception> | Requires acquired RPC originals |

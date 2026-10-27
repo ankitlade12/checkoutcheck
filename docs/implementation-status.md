@@ -34,6 +34,6 @@ Updated October 26, 2026. This is the current status record; the [roadmap](roadm
 2. Supported-product detector/tracker validation, calibration and held-out evaluation beyond this small image sample.
 3. Independent review, correction lineage, retention/withdrawal and cross-user isolation before a community pilot.
 4. Independent user reproduction and usability/accessibility testing; multi-user load and failure testing before scaling.
-5. Devpost final submission and eligibility review. The 4:05 narrated product demo is published through the AWS review endpoint. The requested product-demo format omits the required team appearance.
+5. Devpost final submission and eligibility review. The 4:11 narrated product demo is published through the AWS review endpoint. The video identifies Ankit Hemant Lade and Sai Jasti by name; it contains no live team footage.
 
 No transaction accuracy, shopper-impact improvement, novelty, award eligibility or full community-MVP completion is claimed. Application accounts remain outside the private hackathon scope.
