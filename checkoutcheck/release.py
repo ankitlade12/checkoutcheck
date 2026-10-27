@@ -159,6 +159,12 @@ This is a prepared local package, not an uploaded or accepted competition submis
         diagram.write_text(diagram.read_text().replace('Proposed_AWS_not_deployed','Verified_private_AWS'))
         readme=output/'README.md'
         readme.write_text(readme.read_text().replace('AWS execution and the human team/video/judge-access steps remain pending.', 'AWS execution evidence is included. The human team/video/judge-access steps remain pending.'))
+    # Submission documents share the reviewed repository source of truth.
+    for name in ('technical-report.md','architecture.mmd','architecture.svg','agentic-vision.md','cool-evaluation.md'):
+        source=root/'docs'/name
+        if source.is_file():(output/name).write_bytes(source.read_bytes())
+    (output/'demo-script.md').write_text('The reproducible product-demo recorder is tests/record_submission_demo.py. It uses Indian English male narration and actual AWS application scenes. Team appearance is omitted at the user\'s request and remains an unmet organizer requirement.\n')
+    (output/'README.md').write_text('Read technical-report.md and the source README. The AWS judge endpoint is https://d2pt18a0j9tuil.cloudfront.net. Agent and COOL evidence are available there. This package is prepared for review; Devpost submission is not implied. Team appearance remains unmet.\n')
     with zipfile.ZipFile(output/'checkoutcheck-source.zip','w',zipfile.ZIP_DEFLATED) as archive:
         roots=['checkoutcheck','apps/web','tests','docs','infra','.github']
         files=[root/name for name in ['README.md','LICENSE','CONTRIBUTING.md','SECURITY.md','THIRD_PARTY_NOTICES.md','pyproject.toml','requirements.lock','compose.yaml','run.command','start-aws.command','.dockerignore','.gitignore']]

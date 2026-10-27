@@ -29,6 +29,17 @@
       "Type": "String",
       "AllowedPattern": ".+@.+",
       "Description": "Recipient for budget notifications"
+    },
+    "InstanceType": {
+      "Type": "String",
+      "Default": "t3.large",
+      "AllowedValues": [
+        "t3.micro",
+        "t3.small",
+        "t3.medium",
+        "t3.large"
+      ],
+      "Description": "Use large for CPU inference; small for low-cost read-only judging after evaluation."
     }
   },
   "Resources": {
@@ -204,7 +215,9 @@
         "ImageId": {
           "Ref": "AmiId"
         },
-        "InstanceType": "t3.large",
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
         "CreditSpecification": {
           "CPUCredits": "standard"
         },

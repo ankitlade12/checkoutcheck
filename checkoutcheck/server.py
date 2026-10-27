@@ -6,6 +6,7 @@ import html
 import io
 import json
 import os
+import re
 import sqlite3
 import subprocess
 import sys
@@ -33,9 +34,16 @@ STOP = threading.Event()
 TERMINAL = {"completed", "partial", "failed", "canceled"}
 
 
+def read_only():
+    return os.environ.get('CHECKOUTCHECK_READ_ONLY') == '1'
+
+
 @contextmanager
 def db():
-    connection = sqlite3.connect(DATA / "workbench.sqlite", timeout=30)
+    path = Path(os.environ.get('CHECKOUTCHECK_REVIEW_DB', str(DATA / 'workbench.sqlite'))) if read_only() else DATA / 'workbench.sqlite'
+    connection = sqlite3.connect(path.resolve().as_uri()+'?mode=ro', uri=True, timeout=30) if read_only() else sqlite3.connect(path, timeout=30)
+    if read_only():
+        connection.execute('PRAGMA query_only=ON')
     connection.row_factory = sqlite3.Row
     try:
         with connection:
@@ -203,6 +211,11 @@ def worker():
 
 @asynccontextmanager
 async def lifespan(app):
+    if read_only():
+        with db() as conn:
+            conn.execute('SELECT count(*) FROM runs').fetchone()
+        yield
+        return
     initialize()
     STOP.clear()
     thread = threading.Thread(target=worker, daemon=True)
@@ -219,7 +232,14 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1
 
 @app.middleware("http")
 async def local_boundary(request, call_next):
-    if request.method not in {"GET", "HEAD", "OPTIONS"}:
+    if read_only():
+        path=request.url.path
+        demo_path=path in {'/demo','/demo.mp4'}
+        allowed = path in {'/','/index.html','/favicon.svg','/style.css','/app.js','/evidence.js','/perception.js','/videos.js','/docs','/v1/state','/v1/health','/v1/perception','/v1/videos','/v1/cool','/licenses/RetailAction-LICENSE.txt','/licenses/RetailAction-NOTICE.txt','/licenses/RPC-NOTICE.txt'} or bool(re.fullmatch(r'/v1/perception/images/\d+|/v1/videos/[A-Za-z0-9_-]+/(media|analysis|export)|/v1/runs/[a-f0-9]{32}(/export)?|/v1/cool/(stock|cool|comparison|deployment)',path))
+        comparison = path == '/v1/perception/comparisons' and request.method == 'POST'
+        if not (((allowed or demo_path) and request.method in {'GET','HEAD'}) or comparison):
+            return JSONResponse({'detail':'Public review only; operator actions require the private workspace'},status_code=403)
+    elif request.method not in {"GET", "HEAD", "OPTIONS"}:
         origin = request.headers.get("origin")
         expected = f"{request.url.scheme}://{request.headers.get('host')}"
         if request.headers.get("x-checkoutcheck") != "local" or (origin and origin != expected):
@@ -259,13 +279,16 @@ async def body(request):
 
 @app.get("/v1/state")
 def state():
+    if read_only():
+        return {'assets':[],'cases':[],'suites':[],'runs':[],
+                'runtime':{'mode':'aws_public_review','read_only':True,'aws_connection':{'status':'not_applicable'}}}
     with db() as conn:
         collections = {table: [json.loads(r["data"]) for r in conn.execute(f"SELECT data FROM {table}")]
                        for table in ("assets", "cases", "suites")}
         collections["runs"] = [dict(r) for r in conn.execute(
             "SELECT id,suite_id,status,created,updated,progress,error FROM runs "
             "WHERE json_extract(data,'$.task') IS NULL ORDER BY created DESC LIMIT 100")]
-    collections["runtime"] = {"mode": os.environ.get('CHECKOUTCHECK_RUNTIME', 'local_single_operator'),
+    collections["runtime"] = {"mode": os.environ.get('CHECKOUTCHECK_RUNTIME', 'local_single_operator'), 'read_only':False,
         "aws_connection": connection_status(DATA),
         "adapter": "OpenCV 5 · ArUco inventory", "dataset": "Real recordings only; no bundled dataset"}
     return collections
@@ -276,9 +299,9 @@ def health():
     try:
         with db() as conn:conn.execute('SELECT 1').fetchone()
         thread=getattr(app.state,'worker',None)
-        ready=bool(thread and thread.is_alive() and not STOP.is_set())
-        return JSONResponse({'status':'ready' if ready else 'degraded','database':'available','worker':'running' if ready else 'not_running',
-                             'access':'private_single_operator','execution_environment':os.environ.get('CHECKOUTCHECK_RUNTIME','local_single_operator')},status_code=200 if ready else 503)
+        ready=read_only() or bool(thread and thread.is_alive() and not STOP.is_set())
+        return JSONResponse({'status':'ready' if ready else 'degraded','database':'available','worker':'disabled_read_only' if read_only() else 'running' if ready else 'not_running',
+                             'access':'public_read_only' if read_only() else 'private_single_operator','execution_environment':os.environ.get('CHECKOUTCHECK_RUNTIME','local_single_operator')},status_code=200 if ready else 503)
     except sqlite3.Error:
         return JSONResponse({'status':'degraded','database':'unavailable'},status_code=503)
 
@@ -294,7 +317,7 @@ def perception_state():
     reference_path = DATA / "rpc" / "references" / "manifest.json"
     references = json.loads(reference_path.read_text()) if reference_path.exists() else None
     models={key:{**value,'available':not value.get('requires_model') or (DATA/'models'/value['requires_model']).is_file()} for key,value in PERCEPTION_MODELS.items()}
-    return {"available": available, "manifest": manifest, "runs": runs, "models": models,
+    return {"available": available, "manifest": manifest, "runs": runs, "models": models, 'read_only':read_only(),
             "reference_bank": {"images": len(references["images"]), "categories": len(references["categories"]),
                                "hash": references["hash"], "source_split": references["source_split"]} if references else None}
 
@@ -479,7 +502,10 @@ async def start_run(request: Request):
 
 @app.get("/v1/runs/{identifier}")
 def get_run(identifier: str):
-    return run_record(identifier)
+    run=run_record(identifier)
+    if read_only() and run['data'].get('task')!='rpc_perception':
+        raise HTTPException(404,'Public image run not found')
+    return run
 
 
 @app.post("/v1/runs/{identifier}/cancel")
@@ -509,7 +535,7 @@ async def comparison(request: Request):
 
 @app.get("/v1/runs/{identifier}/export")
 def export(identifier: str):
-    run = run_record(identifier)
+    run = get_run(identifier)
     require(run["result"] is not None, "Run has no scored results")
     if run["result"].get("kind") == "rpc_perception":
         return Response(json.dumps(run["result"], indent=2, allow_nan=False), media_type="application/json",
@@ -543,7 +569,7 @@ def video_state():
     path=DATA/'retailaction'
     if not (path/'manifest.json').is_file():return {'available':False,'videos':[]}
     manifest=load_videos(path)
-    return {'available':True,'manifest':manifest,'videos':[{**v,'analyzed':(path/'analysis'/f"{v['id']}.json").is_file()} for v in manifest['videos']]}
+    return {'available':True,'manifest':manifest,'read_only':read_only(),'videos':[{**v,'analyzed':(path/'analysis'/f"{v['id']}.json").is_file()} for v in manifest['videos']]}
 
 
 @app.get('/v1/videos/{identifier}/media')
@@ -574,6 +600,43 @@ async def run_video_analysis(identifier: str):
 def export_video_analysis(identifier: str):
     result=video_analysis(identifier)
     return Response(json.dumps(result,indent=2),media_type='application/json',headers={'Content-Disposition':f'attachment; filename="{identifier}-analysis.json"'})
+
+
+@app.get('/v1/cool')
+def cool_evidence():
+    root=DATA/'outputs/cool'
+    if not all((root/(name+'.json')).is_file() for name in ('stock','cool','comparison','deployment')):
+        return {'available':False}
+    return {'available':True,'comparison':json.loads((root/'comparison.json').read_text()),
+            'deployment':json.loads((root/'deployment.json').read_text())}
+
+
+@app.get('/v1/cool/{name}')
+def cool_export(name: str):
+    if name not in ('stock','cool','comparison','deployment'):
+        raise HTTPException(404,'Benchmark artifact not found')
+    path=DATA/'outputs/cool'/(name+'.json')
+    if not path.is_file():raise HTTPException(404,'Benchmark artifact not installed')
+    return FileResponse(path,media_type='application/json',filename=name+'.json')
+
+
+@app.get('/licenses/{name}')
+def source_license(name: str):
+    if name not in ('RetailAction-LICENSE.txt','RetailAction-NOTICE.txt','RPC-NOTICE.txt'):
+        raise HTTPException(404,'License not found')
+    return FileResponse(ROOT/'docs/licenses'/name,media_type='text/plain')
+
+
+@app.get('/demo', response_class=HTMLResponse)
+def product_demo():
+    return '''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CheckoutCheck product demo</title><link rel="stylesheet" href="/style.css"></head><body><article class="prose"><h1>CheckoutCheck product demo</h1><p>Problem, working application, agent decisions, AWS architecture and measured COOL results. 4 minutes 5 seconds. Indian English male computer narration.</p><video controls preload="metadata" width="960" src="/demo.mp4"></video><p><a href="/">Open the application</a> · <a href="https://github.com/ankitlade12/checkoutcheck">Source and technical report</a></p><h2>Source credits and licenses</h2><p>RPC photographs: Wei et al., <a href="https://rpc-dataset.github.io/">RPC dataset</a>, <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. Application overlays added. <a href="/licenses/RPC-NOTICE.txt">RPC notice</a>.</p><p>RetailAction footage: Standard Cognition, publisher-anonymized originals, displayed within the application. <a href="/licenses/RetailAction-LICENSE.txt">Standard.AI Dataset License (copy)</a> · <a href="/licenses/RetailAction-NOTICE.txt">Notice</a>. Copyright © Standard Corp. All Rights Reserved.</p><p>Original presentation and narration: CheckoutCheck, CC BY-NC-SA 4.0; third-party footage retains its separate license. Software code is MIT licensed.</p></article></body></html>'''
+
+
+@app.get('/demo.mp4')
+def product_demo_video():
+    path=DATA/'outputs/checkoutcheck-product-demo.mp4'
+    if not path.is_file():raise HTTPException(404,'Product demo not installed')
+    return FileResponse(path,media_type='video/mp4')
 
 
 app.mount("/", StaticFiles(directory=ROOT / "apps" / "web", html=True), name="web")

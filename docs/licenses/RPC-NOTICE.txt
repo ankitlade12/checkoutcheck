@@ -1,0 +1,7 @@
+RPC: A Large-Scale and Fine-Grained Retail Product Checkout Dataset.
+Xiu-Shen Wei, Quan Cui, Lei Yang, Peng Wang, Lingqiao Liu, Jian Yang.
+Source: https://rpc-dataset.github.io/
+License: CC BY-NC-SA 4.0
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+Original photographs and annotations; no generated images or invented POS records.
+Keep this dataset outside the source repository. Public/commercial use requires a separate rights review.

@@ -1,0 +1,3 @@
+This Dataset is licensed under the Standard.AI Dataset License, Copyright © Standard Corp. All Rights Reserved.
+Original source: https://huggingface.co/datasets/standard-cognition/RetailAction
+No synthetic videos or transaction events.

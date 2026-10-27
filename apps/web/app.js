@@ -24,32 +24,37 @@ function runTable(runs) {
 }
 function route() {
   const page = location.hash.slice(1) || 'overview';
-  const selected = pageTitles[page] ? page : 'overview';
+  const selected = state.runtime?.read_only && !['perception','videos','settings'].includes(page) ? 'perception' : pageTitles[page] ? page : 'overview';
   document.querySelectorAll('.page').forEach(el=>el.hidden=el.id!==selected);
   document.querySelectorAll('[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===selected);if(el.dataset.page===selected)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});
   $('#breadcrumb').textContent=pageTitles[selected];
 }
 function render() {
-  const cloud = state.runtime?.mode === 'aws_private_single_operator';
+  const reviewOnly = state.runtime?.read_only === true;
+  const cloud = reviewOnly || state.runtime?.mode === 'aws_private_single_operator';
+  if(reviewOnly){
+    document.querySelectorAll('button[data-action], [data-page="overview"], [data-page="suites"], [data-page="runs"], [data-page="cases"], [data-page="compare"]').forEach(node=>node.hidden=true);
+    if(!location.hash)location.hash='perception';
+  }
   $('#workspace-location').textContent = cloud ? 'AWS workspace' : 'Local workspace';
   $('#engine-location').textContent = cloud ? 'AWS engine' : 'Local engine';
-  $('.environment').textContent = cloud ? '◉ Private AWS deployment' : '◉ Local development';
+  $('.environment').textContent = reviewOnly ? '◉ AWS judge demo · inspect measured results' : cloud ? '◉ Private AWS deployment' : '◉ Local development';
   const connection = state.runtime?.aws_connection;
   const checked = connection?.status === 'checked';
-  $('#aws-sidebar-status').textContent = cloud ? 'Private EC2 · instance role' : checked ? 'AWS account checked · local engine' : 'AWS connection needs checking';
+  $('#aws-sidebar-status').textContent = reviewOnly ? 'AWS · public review' : cloud ? 'Private EC2 · instance role' : checked ? 'AWS account checked · local engine' : 'AWS connection needs checking';
   $('#aws-connection-status').textContent = cloud ? 'EC2 instance role' : checked ? 'Connection checked' : 'Needs checking';
   $('#execution-status').textContent = cloud ? 'See measured AWS runs' : 'Local results';
-  $('#aws-connection-detail').textContent = cloud ? 'Private AWS worker. Jobs execute here using original data; inspect completed runs for measured results. No browser or root credentials are stored in this container.' : connection?.checked_at ? `Account ending ${connection.account_suffix} · ${connection.region} · checked ${new Date(connection.checked_at).toLocaleString()}. This is a recorded connection check, not proof of current credentials or cloud execution.` : 'No AWS connection check recorded. The application runs locally.';
+  $('#aws-connection-detail').textContent = reviewOnly ? 'Public review of measured AWS results. Uploads and execution are available only in the private operator workspace.' : cloud ? 'Private AWS worker. Jobs execute here using original data; inspect completed runs for measured results. No browser or root credentials are stored in this container.' : connection?.checked_at ? `Account ending ${connection.account_suffix} · ${connection.region} · checked ${new Date(connection.checked_at).toLocaleString()}. This is a recorded connection check, not proof of current credentials or cloud execution.` : 'No AWS connection check recorded. The application runs locally.';
 
   $('#suite-count').textContent=state.suites.length;
   $('#overview-stats').innerHTML=stat('Scenario suites',state.suites.length,'Immutable evaluation versions')+stat('Evidence cases',state.cases.length,'Real recordings only')+stat('Completed runs',state.runs.filter(r=>r.status==='completed').length,'All submitted cases scored')+stat('Active evaluations',state.runs.filter(r=>!terminal.has(r.status)).length,'Single worker · sequential processing');
   $('#recent-runs').innerHTML=runTable(state.runs.slice(0,4));
   $('#run-list').innerHTML=runTable(state.runs);
   $('#suite-list').innerHTML=state.suites.length?`<div class="suite-grid">${state.suites.map(s=>`<article class="panel suite-card"><span class="tag">FROZEN · TRACK ${esc(s.suite.input_track)}</span><h2>${esc(s.name)}</h2><p>${s.entries.length} reviewed cases · ${esc(s.suite.evidence_kind)} recordings<br>${[...new Set(s.entries.map(e=>e.annotation.split))].map(esc).join(' · ')}</p><div class="hash mono">SHA-256 ${esc(s.hash)}</div><div class="actions"><button class="primary" data-evaluate="${esc(s.id)}">▷ Evaluate suite</button><button class="secondary" data-download-suite="${esc(s.id)}">Manifest ↓</button></div></article>`).join('')}</div>`:`<div class="panel">${empty('Build your first scenario suite','Add real recordings and review their annotations before freezing a suite. Suite hashes bind media, scan events, configuration, and labels.','ingest','Add a recording')}</div>`;
-  $('#case-list').innerHTML=state.cases.length?`<div class="panel table-scroll"><table><thead><tr><th>Case</th><th>Transaction truth</th><th>Visibility</th><th>Review</th><th>Split</th></tr></thead><tbody>${state.cases.map(c=>`<tr><td><button class="row-link" data-case="${esc(c.id)}">${esc(c.title)}</button><small>${esc(c.id)}</small></td><td>${esc(c.annotation.truth)}</td><td>${esc(c.annotation.visibility)}</td><td>${badge(c.annotation.review_status)}</td><td>${esc(c.annotation.split)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="panel">${empty('Your evidence library is empty','No generated clips or invented results. Add a real recording, a mock transaction log, and independently reviewed annotations.','ingest','Import real footage')}</div>`;
+  $('#case-list').innerHTML=state.cases.length?`<div class="panel table-scroll"><table><thead><tr><th>Case</th><th>Transaction truth</th><th>Visibility</th><th>Review</th><th>Split</th></tr></thead><tbody>${state.cases.map(c=>`<tr><td><button class="row-link" data-case="${esc(c.id)}">${esc(c.title)}</button><small>${esc(c.id)}</small></td><td>${esc(c.annotation.truth)}</td><td>${esc(c.annotation.visibility)}</td><td>${badge(c.annotation.review_status)}</td><td>${esc(c.annotation.split)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="panel">${empty('Your evidence library is empty','No generated clips or invented results. Add a real recording, a synchronized transaction log, and independently reviewed annotations.','ingest','Import real footage')}</div>`;
   for(const id of ['baseline','candidate']) {const node=$('#'+id), value=node.value;node.innerHTML='<option value="">Choose a scored run</option>'+state.runs.filter(r=>['completed','partial'].includes(r.status)).map(r=>`<option value="${esc(r.id)}">${esc(suiteName(r.suite_id))} · ${esc(r.id.slice(0,8))}</option>`).join('');node.value=value;}
 }
-async function refresh() {state=await api('/state');render();}
+async function refresh() {state=await api('/state');render();route();}
 function modal(title, html, handler) {
   $('#modal-title').textContent=title;$('#modal-body').innerHTML=`<div class="modal-content"><div id="form-error" class="error" hidden></div>${html}</div>`;
   if(!$('#modal').open)$('#modal').showModal();

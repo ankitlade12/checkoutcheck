@@ -1,0 +1,19 @@
+flowchart TD
+    Judge[Judge browser] --> CF[CloudFront HTTPS]
+    CF --> Review[EC2 read-only review service]
+    Review --> Snapshot[(SQLite review snapshot)]
+    Operator[Private operator via IAM / SSM] --> API[FastAPI and SQLite queue]
+    API --> Worker[Bounded worker]
+    S3[Private S3 original inputs and weights] --> Worker
+    Worker --> CV[OpenCV 5 preprocessing and diagnostics]
+    CV --> Agent{Observe and select next tool}
+    Agent --> Watershed[OpenCV watershed]
+    Agent --> Neural[PyTorch detector]
+    Watershed --> Eval[Evaluator; reference annotations enter here]
+    Neural --> Eval
+    Eval --> API
+    API --> Snapshot
+    Agent --> Human[Human inspection; no automatic enforcement]
+    Worker --> Logs[CloudWatch]
+    COOL[Temporary official COOL on Graviton] --> Baseline[Actual pipelines vs stock OpenCV]
+    Baseline --> Snapshot

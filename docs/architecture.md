@@ -26,6 +26,10 @@ The local UI uses buildless HTML, CSS, and JavaScript. This was chosen to keep t
 
 ## Login-free hackathon deployment
 
-The user chose no application login for the hackathon. The deployed private POC uses a single EC2 host, encrypted storage, private S3, a restricted instance role, CloudWatch logs and IAM-authorized Session Manager port forwarding. Its security group has no inbound ports. The browser connects to a local forwarded address, or judges view an arranged screen share. No public application endpoint or multi-user access is provided. The stack is deployed in the personal account in us-east-1. The operator uses temporary CLI login credentials; the worker uses its scoped EC2 role. No credentials are included in source or containers.
+The private operator application uses EC2, a scoped instance role, private encrypted S3 inputs, CloudWatch logs and IAM-authorized Session Manager forwarding. A separate public review container serves completed results through CloudFront HTTPS. Only CloudFront can reach the origin port, and nginx also validates a private origin header. The public API allows only reviewed read paths plus a side-effect-free comparison operation. It has no worker and reads a consistent SQLite snapshot from a read-only volume. Private transaction media and mutation routes are blocked.
 
-See [deployment template](../infra/aws-poc.json) and [operations steps](../infra/aws-poc-operations.md). The CPU-only Linux/amd64 container has built and passed health checks both locally and on EC2. Actual browser, inference and backup verification are recorded separately in the AWS verification report. A static frontend alone would not demonstrate the required AWS vision workload.
+The worker keeps its original writable database. Backups, agent traces and COOL reports remain on EC2; generated results are not uploaded to S3. The temporary COOL instance ran the actual application pipelines on the official Arm runtime, transferred its reports directly over a restricted VPC connection, and was terminated after checksum verification.
+
+![AWS, OpenCV and agent architecture](architecture.svg)
+
+See [private deployment](../infra/aws-poc.json), [public review deployment](../infra/aws-public-review.json), [agent workflow](agentic-vision.md), [COOL evaluation](cool-evaluation.md) and [technical report](technical-report.md). A static frontend alone would not demonstrate the AWS workload; actual cloud inference and benchmark evidence are available in the application.

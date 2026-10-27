@@ -20,6 +20,7 @@ MODELS = {
     "sift-reference-v1": {"name": "Real-reference SIFT matcher", "requires_references": True},
     "fasterrcnn-coco-v1": {"name": "Faster R-CNN · COCO baseline", "requires_model": "fasterrcnn_mobilenet_v3_large_fpn-fb6a3cc7.pth"},
     "fasterrcnn-rpc-v1": {"name": "Faster R-CNN · real RPC fine-tune", "requires_model": "rpc-fasterrcnn-v1/manifest.json"},
+    "vision-agent-v1": {"name": "Vision investigation agent", "requires_model": "rpc-fasterrcnn-v1/manifest.json"},
 }
 CONFIG = {"max_dimension": 960, "lab_distance": 24, "minimum_area_fraction": 0.0006,
           "maximum_area_fraction": 0.75, "morphology_kernel": 3, "peak_window": 31,
@@ -209,7 +210,11 @@ def run_benchmark(directory, model):
     matcher=None
     learned=None
     adapter_config=CONFIG
-    if model=="sift-reference-v1":
+    if model=='vision-agent-v1':
+        from .agent import VisionAgent
+        learned=VisionAgent(root.parent)
+        adapter_config=learned.provenance
+    elif model=="sift-reference-v1":
         from .reference_matcher import ReferenceMatcher, CONFIG as REFERENCE_CONFIG
         matcher=ReferenceMatcher(root/"references")
         adapter_config={**REFERENCE_CONFIG,"match_iou":CONFIG["match_iou"],"reference_manifest_hash":matcher.bank["manifest_hash"]}
@@ -229,7 +234,7 @@ def run_benchmark(directory, model):
         except (OSError, ValueError, cv2.error) as error:
             failures.append({"image_id": entry["id"], "reason": str(error)})
     report = score_predictions(manifest, predictions, CONFIG["match_iou"])
-    return {"kind": "rpc_perception", "status": "partial" if failures else "completed", "manifest": manifest,
+    result = {"kind": "rpc_perception", "status": "partial" if failures else "completed", "manifest": manifest,
             "adapter": {"id": model, "name": MODELS[model]["name"], "config": adapter_config,
                         "code_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                         "reference_matcher_code_sha256":hashlib.sha256(Path(__file__).with_name("reference_matcher.py").read_bytes()).hexdigest() if matcher else None,
@@ -243,6 +248,11 @@ def run_benchmark(directory, model):
                     "Only two training exemplars per product; orientation, occlusion and packaging changes can defeat matching." if matcher else
                     "Fixed untuned classical baseline; touching objects may merge, single objects may split, white products may disappear.",
                     "Image predictions do not establish scan status, payment, or unnecessary intervention."]}
+    if model=='vision-agent-v1':
+        from .agent import summarize
+        result['agent_evaluation']=summarize(predictions)
+        result['adapter']['capability']='Bounded deterministic perception-decision-action workflow; no transaction enforcement'
+    return result
 
 
 def verify_result(result):

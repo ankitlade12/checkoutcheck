@@ -6,18 +6,20 @@ Updated October 26, 2026. This is the current status record; the [roadmap](roadm
 
 | Area | Implemented and checked | Practical limit |
 | --- | --- | --- |
-| Image perception | Five methods; 24 original RPC validation photos; overlays, comparison, exports and exact score recomputation | Exploratory subset; best detector recall 36.08%, no neural SKU head |
+| Image perception | Five baselines plus an adaptive agent; 24 original RPC validation photos; overlays, comparison, exports and exact score recomputation | Exploratory subset; best detector recall 36.08%, no neural SKU head |
 | Original videos | Six RetailAction clips, 176 frames; playback, source-time mapping, seeking, diagnostics and exports | Shelf interactions with publisher labels; no POS/payment truth |
 | Job lifecycle | SQLite queue, idempotency, persistence, bounded subprocesses, cancellation and restart retry | One operator and worker; no distributed leases |
 | Transaction software | MP4 validation, recorded JSON/CSV scan-log validation, immutable suites, marker adapter, imported predictions, event replay and deterministic scoring | Software tests pass; real synchronized checkout capture is unavailable |
 | Local application | Navigation, intake, image/video workflows and mobile layout; no JavaScript errors in verified browser runs | No application login or tenant isolation |
-| AWS execution | CPU-only EC2, scoped instance role, private encrypted inputs, CloudWatch logs, SSM tunnel; all five methods and six video workflows checked | Private demonstration; compute stopped after verification |
+| AWS execution | CPU-only EC2, scoped instance role, private encrypted inputs, CloudWatch logs, SSM tunnel; all five methods and six video workflows checked | Public HTTPS review verified; execution stays private |
+| Agentic Vision | Actual AWS trace: 18 neural / 6 watershed routes, 17 inspection recommendations, 72 tool calls, no budget violations | Deterministic controller; lower detection recall than the trained detector alone |
+| COOL | Official vendor OpenCV 5.1.0-dev on c8g.large; same-machine stock comparison and raw reports | Observed 1.033× / 1.041× speedups; small sequential benchmark, different runtime versions |
 | Recovery | Online SQLite snapshot restored into an isolated database; integrity check passed | Cloud backup remains on EC2 only by operator choice; deleting its volume deletes that backup |
 | Packaging | Source/evidence archive, technical report, diagram, checksums and actual local/AWS walkthroughs | Generated artifacts remain private and are absent from Git |
 
 ## Verification evidence
 
-- **56 tests passed** in the original-data environment, covering evaluator arithmetic, validation, API behavior, lifecycle, acquisition integrity and training provenance.
+- **64 tests passed** in the original-data environment, covering evaluator arithmetic, validation, API behavior, lifecycle, acquisition integrity and training provenance.
 - Source-only GitHub CI intentionally skips real-data checks when licensed originals or model weights are absent. Passing CI alone does not establish model quality.
 - AWS browser checks exercised all five methods, cancellation, reload persistence, image overlays, comparisons and report export. Each successful image score was independently recomputed.
 - Video checks covered all six original clips, frame/source-time seeking, fresh diagnostics, HTTP range requests, export and mobile layout, with zero JavaScript or HTTP failures.
@@ -32,6 +34,6 @@ Updated October 26, 2026. This is the current status record; the [roadmap](roadm
 2. Supported-product detector/tracker validation, calibration and held-out evaluation beyond this small image sample.
 3. Independent review, correction lineage, retention/withdrawal and cross-user isolation before a community pilot.
 4. Independent user reproduction and usability/accessibility testing; multi-user load and failure testing before scaling.
-5. Human team introduction, final reviewed video, judge access and competition submission.
+5. Devpost final submission and eligibility review. The 4:05 narrated product demo is published through the AWS review endpoint. The requested product-demo format omits the required team appearance.
 
 No transaction accuracy, shopper-impact improvement, novelty, award eligibility or full community-MVP completion is claimed. Application accounts remain outside the private hackathon scope.

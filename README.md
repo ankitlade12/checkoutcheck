@@ -3,33 +3,37 @@
 [![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![OpenCV 5](https://img.shields.io/badge/OpenCV-5.0-5C3EE8.svg?logo=opencv&logoColor=white)](https://opencv.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![AWS](https://img.shields.io/badge/AWS-private%20deployment-FF9900.svg)](docs/aws-verification.md)
+[![AWS](https://img.shields.io/badge/AWS-HTTPS%20demo-FF9900.svg)](docs/aws-verification.md)
 [![CI](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml/badge.svg)](https://github.com/ankitlade12/checkoutcheck/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 
 > **Inspect what the camera observed, measure what the model missed, and reproduce the score.**
 
-CheckoutCheck is an evidence workbench for engineers evaluating camera-assisted checkout systems. It brings original photographs and videos, model predictions, reference annotations and reproducible evaluation into one private application.
+CheckoutCheck is an evidence workbench for engineers evaluating camera-assisted checkout systems. It brings original photographs and videos, model predictions, reference annotations and reproducible evaluation into one inspectable application.
 
-The working hackathon POC includes five image methods, an original-video lab and a separately implemented transaction evaluator. Image and video workflows have been exercised locally and on AWS. Real synchronized checkout/POS validation remains an open requirement.
+The working hackathon POC includes five image baselines, an adaptive vision agent, an original-video lab and a separately implemented transaction evaluator. Image and video workflows have been exercised locally and on AWS. Real synchronized checkout/POS validation remains an open requirement.
 
 **Hackathon:** [OpenCV 2026](https://opencv26.devpost.com/)
 
 ## Quick Highlights
 
 - **Original-data inspection** — 24 RPC validation photos, 400 training references and six RetailAction clips in the verified installation; acquired separately from source.
-- **Five measured image methods** — connected components, watershed, SIFT reference matching, COCO Faster R-CNN and a real-photo RPC fine-tune.
+- **Five measured image baselines** — connected components, watershed, SIFT reference matching, COCO Faster R-CNN and a real-photo RPC fine-tune.
 - **Inspectable predictions** — separate publisher/reference and model overlays, difficulty breakdowns, counting and optional SKU metrics.
 - **Original-video replay** — playback, frame seeking, publisher source timestamps and OpenCV motion/sharpness diagnostics.
 - **Persistent evaluation** — SQLite-backed queue, idempotent submissions, bounded subprocesses, cancellation and restart recovery.
 - **Reproducible reports** — source/model hashes, explicit exclusions, compatible-run comparison and independently recomputable JSON scores.
-- **Private AWS execution** — CPU-only EC2 worker, scoped instance role, encrypted storage, CloudWatch logs and no inbound security-group ports.
+- **AWS execution and public review** — CPU-only EC2 worker, scoped role, encrypted inputs, CloudWatch logs, and a separate read-only CloudFront HTTPS service.
+- **Agentic workflow** — OpenCV observations select the next tool; bounded calls, visible traces and human inspection recommendations.
+- **Actual COOL evaluation** — official vendor runtime on Graviton; application workloads measured against stock OpenCV, with raw reports.
 - **Visible limitations** — no inferred payment truth, intent detection or production-accuracy claims.
 
 ## Deployment and Demo Access
 
 | Surface | Address or entry point | Access |
 | --- | --- | --- |
+| Product demo · 4:05 | [Watch with Indian English narration](https://d2pt18a0j9tuil.cloudfront.net/demo) | Working product, architecture and principal results |
+| Public judge demo | [Open CheckoutCheck](https://d2pt18a0j9tuil.cloudfront.net) | Inspect results, agent traces, original clips and COOL evidence |
 | Local application | <http://127.0.0.1:8765> | Start `./run.command` after installation |
 | Real-data lab | <http://127.0.0.1:8765/#perception> | Requires acquired RPC originals |
 | Real-video lab | <http://127.0.0.1:8765/#videos> | Requires acquired RetailAction originals |
@@ -38,7 +42,7 @@ The working hackathon POC includes five image methods, an original-video lab and
 | API contracts | [`docs/contracts.md`](docs/contracts.md) | Also served at `/docs` |
 | Cloud verification | [`docs/aws-verification.md`](docs/aws-verification.md) | Recorded measurements and limitations |
 
-These localhost addresses are not public hosted demos. A fresh clone contains no datasets, model weights, AWS credentials or deployment records. Judges can run the source with authorized originals or arrange a demonstration with the maintainer. Cloud compute is stopped between demonstrations; retained storage can still incur charges.
+The HTTPS judge demo exposes completed evidence through a separate read-only service. Execution and uploads remain in the private operator workspace. A fresh clone contains no datasets, weights or credentials. See the [technical report](docs/technical-report.md), [agent evaluation](docs/agentic-vision.md), [COOL benchmark](docs/cool-evaluation.md) and [public hosting guide](infra/aws-public-review.md).
 
 ## The Problem
 
@@ -191,7 +195,7 @@ node --check apps/web/perception.js
 node --check apps/web/videos.js
 ```
 
-The verified original-data environment passes **56 tests**. Fresh-clone CI skips tests whose separately acquired originals or trained weights are absent; its result does not certify image/video accuracy. Temporary numeric and parser test inputs never populate the application as evidence.
+The verified original-data environment passes **64 tests**. Fresh-clone CI skips tests whose separately acquired originals or trained weights are absent; its result does not certify image/video accuracy. Temporary numeric and parser test inputs never populate the application as evidence.
 
 Browser checks require Playwright and Chromium installed separately:
 
@@ -247,7 +251,7 @@ checkoutcheck/
 | `CHECKOUTCHECK_BROWSER` | Playwright-managed browser | Optional Chromium executable |
 | `CHECKOUTCHECK_RECORDING_DIR` | `artifacts/demo-recording` | Private walkthrough recording destination |
 
-No LLM API key or AWS account is needed locally. Keep the application on loopback or behind the private SSM tunnel; it has no public-user authentication or tenant isolation.
+No LLM API key or AWS account is needed locally. Keep the operator application on loopback or behind the private SSM tunnel. Public hosting must use the separate read-only review mode described in the hosting guide.
 
 ## Roadmap and Known Limits
 
